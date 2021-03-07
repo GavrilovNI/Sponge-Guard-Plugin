@@ -1,13 +1,9 @@
 package me.doggy.justguard.region;
 
-import me.doggy.justguard.utils.Bounds;
+import me.doggy.justguard.Bounds;
 import ninja.leaping.configurate.ConfigurationNode;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
-import org.spongepowered.api.world.extent.Extent;
-
-import java.util.HashMap;
-import java.util.UUID;
 
 public class LocalRegion<E extends World> extends Region {
 

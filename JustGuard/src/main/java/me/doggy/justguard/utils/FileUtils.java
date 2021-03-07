@@ -33,13 +33,13 @@ public class FileUtils {
             }
             catch (IOException e)
             {
-                logger.warn("Error on copying resource '"+name+"'.", e);
+                logger.error("Error on copying resource '"+name+"'.", e);
             }
 
         }
         else
         {
-            logger.warn("Can't find resource '"+name+"'.");
+            logger.error("Can't find resource '"+name+"'.");
         }
         return false;
     }

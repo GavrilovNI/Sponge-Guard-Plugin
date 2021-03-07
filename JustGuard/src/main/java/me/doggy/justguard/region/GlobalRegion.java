@@ -1,13 +1,10 @@
 package me.doggy.justguard.region;
 
-import me.doggy.justguard.utils.Bounds;
 import ninja.leaping.configurate.ConfigurationNode;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
-import org.spongepowered.api.world.extent.Extent;
 
-import java.lang.ref.WeakReference;
 import java.util.UUID;
 
 import static com.google.common.base.Preconditions.checkNotNull;

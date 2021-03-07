@@ -1,4 +1,4 @@
-package me.doggy.justguard.utils;
+package me.doggy.justguard;
 
 import com.flowpowered.math.vector.Vector3d;
 import javafx.util.Pair;

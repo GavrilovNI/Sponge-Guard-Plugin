@@ -25,7 +25,7 @@ import java.util.UUID;
 @Plugin(
         id = JustGuard.PLUGIN_ID,
         version = JustGuard.PLUGIN_VERSION,
-        name = "JustGuard",
+        name = JustGuard.PLUGIN_NAME,
         description = "It's Just Guard plugin",
         authors = {
                 "DoGGy"
@@ -35,10 +35,11 @@ public class JustGuard {
 
     public static final String PLUGIN_ID = "justguard";
     public static final String PLUGIN_VERSION = "1.0.0";
+    public static final String PLUGIN_NAME = "JustGuard";
 
     private static JustGuard _instance;
 
-    public static List<Region> REGIONS = new ArrayList<>();
+    public static HashMap<String, Region> REGIONS = new HashMap<>();
 
     @Inject
     @ConfigDir(sharedRoot = false)
@@ -57,9 +58,9 @@ public class JustGuard {
     {
         _instance = this;
 
-        _logger.info("  __   __  ");
-        _logger.info(" (__  | _  SafeGuard v"+PLUGIN_VERSION+" by DoGGy");
-        _logger.info("  __) \\__) Running on Sponge - SpongeForge");
+        _logger.info("   _   __  ");
+        _logger.info("    |  | _  "+PLUGIN_NAME+" v"+PLUGIN_VERSION+" by DoGGy");
+        _logger.info("  \\_|  \\__) Running on Sponge - SpongeForge");
         _logger.info("           ");
     }
 
