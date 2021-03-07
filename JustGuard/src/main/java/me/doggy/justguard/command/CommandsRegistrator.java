@@ -78,6 +78,12 @@ public class CommandsRegistrator {
                 .executor(new CommandReload())
                 .build();
 
+        CommandSpec cmdWand = CommandSpec.builder()
+                .description(Text.of("No command description"))
+                .permission("safeguard.command.wand")
+                .executor(new CommandWand())
+                .build();
+
         CommandSpec cmdJustGuard = CommandSpec.builder()
                 .description(Text.of("No command description"))
                 .permission("safeguard.command.justguard")
@@ -85,6 +91,7 @@ public class CommandsRegistrator {
                 .child(cmdVersion, "version")
                 .child(cmdReload, "reload")
                 .child(cmdRegion, "region", "rg")
+                .child(cmdWand, "wand")
                 .build();
 
         JustGuard plugin = JustGuard.getInstance();

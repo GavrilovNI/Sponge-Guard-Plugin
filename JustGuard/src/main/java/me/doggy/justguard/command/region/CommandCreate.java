@@ -1,6 +1,7 @@
 package me.doggy.justguard.command.region;
 
 import me.doggy.justguard.JustGuard;
+import me.doggy.justguard.config.ConfigManager;
 import me.doggy.justguard.config.TextManager;
 import me.doggy.justguard.config.Texts;
 import me.doggy.justguard.region.Region;
@@ -36,7 +37,7 @@ public class CommandCreate implements CommandExecutor
             return CommandResult.builder().successCount(0).build();
 
         World world = worldOpt.get();
-        ConfigurationNode flags = FileUtils.getFileNode("defaultFlags.conf", JustGuard.getInstance().getConfigManager().getConfigDir());
+        ConfigurationNode flags = JustGuard.getInstance().getConfigManager().getDefaultRegionFlags();
         Region.RegionType regionType = regionTypeOpt.get();
 
         Pending.createRegion(src, regionType, flags, world);

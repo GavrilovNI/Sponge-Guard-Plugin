@@ -69,4 +69,9 @@ public class ConfigManager {
             flags.put(keyStr.toLowerCase(), value);
         }
     }
+
+    public ConfigurationNode getDefaultRegionFlags()
+    {
+        return FileUtils.getFileNode("defaultFlags.conf", configDir);
+    }
 }

@@ -3,6 +3,7 @@ package me.doggy.justguard;
 import com.google.inject.Inject;
 import me.doggy.justguard.command.CommandsRegistrator;
 import me.doggy.justguard.config.ConfigManager;
+import me.doggy.justguard.events.EventRegionSelect;
 import me.doggy.justguard.events.TestEventListener;
 import me.doggy.justguard.region.Region;
 import org.slf4j.Logger;
@@ -80,6 +81,7 @@ public class JustGuard {
         EventManager eventManager = Sponge.getEventManager();
 
         eventManager.registerListeners(this, new TestEventListener());
+        eventManager.registerListeners(this, new EventRegionSelect());
 
     }
 
