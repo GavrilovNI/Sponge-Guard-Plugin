@@ -15,6 +15,7 @@ public class CommandVersion implements CommandExecutor
     public CommandResult execute(CommandSource src, CommandContext args)
     {
         src.sendMessage(Text.of(TextManager.getText(Texts.CMD_ANSWER_VERSION, JustGuard.PLUGIN_VERSION)));
+
         return CommandResult.success();
     }
 }

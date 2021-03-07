@@ -33,6 +33,7 @@ public abstract class Region {
     protected UUID uuid;
     protected Map<UUID, PlayerState> playerStates;
     transient protected ConfigurationNode flags;
+    //protected String name;
 
     public Region(RegionType regionType, ConfigurationNode flags)
     {
@@ -45,10 +46,14 @@ public abstract class Region {
     public RegionType getRegionType() { return regionType; }
     public UUID getUUID() { return uuid; }
     public abstract World getWorld();
+
+    //public String getName() { return name; }
+
     public abstract <E extends World> boolean isInside(Location<E> location);
 
     public ConfigurationNode getFlags() { return flags; }
     public void setFlags(ConfigurationNode flags) { this.flags = flags; }
+    //public void setName(String value) { name = value; }
 
     public void setPlayerState(UUID uuid, PlayerState playerState)
     {
