@@ -27,6 +27,7 @@ public class Texts
     public static final String CMD_ANSWER_REGION_REMOVED = "cmd-answer-region-removed";
     public static final String CMD_ANSWER_REGIONS_SAVED = "cmd-answer-regions-saved";
     public static final String CMD_ANSWER_BOUNDS_EXPANDED = "cmd-answer-bounds-expanded";
+    public static final String CMD_ANSWER_BOUNDS_EXPANDED_VERT = "cmd-answer-bounds-expanded-vert";
 
 
     public static final String NO_PERMISSION= "no-permission";

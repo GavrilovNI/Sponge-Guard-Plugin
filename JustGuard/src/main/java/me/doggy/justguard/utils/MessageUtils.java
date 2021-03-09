@@ -46,7 +46,8 @@ public class MessageUtils {
 
     public static void Send(MessageReceiver receiver, Text text)
     {
-        receiver.sendMessage(text);
+        if(!text.isEmpty())
+            receiver.sendMessage(text);
     }
 
     public static void SendError(MessageReceiver receiver, Text text)

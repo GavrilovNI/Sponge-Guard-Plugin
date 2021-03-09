@@ -71,6 +71,23 @@ public class AABBBuilder {
 
         return this;
     }
+    public AABBBuilder expandVert()
+    {
+        final int maxY = 255;
+
+        if(firstCorner.getY() < secondCorner.getY())
+        {
+            firstCorner = new Vector3d(firstCorner.getX(), 0, firstCorner.getZ());
+            secondCorner = new Vector3d(secondCorner.getX(), maxY, secondCorner.getZ());
+        }
+        else
+        {
+            firstCorner = new Vector3d(firstCorner.getX(), maxY, firstCorner.getZ());
+            secondCorner = new Vector3d(secondCorner.getX(), 0, secondCorner.getZ());
+        }
+
+        return this;
+    }
 
     public AABB build()
     {

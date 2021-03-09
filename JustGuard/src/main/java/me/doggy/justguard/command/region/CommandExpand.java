@@ -54,7 +54,7 @@ public class CommandExpand implements CommandExecutor
 
             Direction direction = directionOpt.get();
             if(!AABBBuilder.isDirectionAvaliableToExpand(direction)) {
-                MessageUtils.SendError(source, Text.of(TextManager.getText(Texts.ERR_NO_PENDING_REGION_FOUND)));
+                MessageUtils.SendError(source, Text.of(TextManager.getText(Texts.ERR_WRONG_DIRECTION_TO_EXPAND)));
                 return CommandResult.success();
 
             }

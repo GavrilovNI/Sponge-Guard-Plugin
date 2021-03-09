@@ -44,13 +44,21 @@ public class CommandsRegistrator {
                 .executor(new CommandClaim())
                 .build();
 
+        CommandSpec cmdRegionExpandVert = CommandSpec.builder()
+                .description(Text.of("No command description"))
+                .permission(Permissions.COMMAND_REGION_EXPAND_VERT)
+                .executor(new CommandExpandVert())
+                .build();
+
         CommandSpec cmdRegionExpand = CommandSpec.builder()
                 .description(Text.of("No command description"))
-                .permission(Permissions.COMMAND_REGION_EXPAND)
+                .permission(Permissions.COMMAND_REGION_EXPAND_BASE)
                 .arguments(GenericArguments.integer(Text.of("length")),
                         GenericArguments.optional(GenericArguments.enumValue(Text.of("direction"), Direction.class)))
                 .executor(new CommandExpand())
+                .child(cmdRegionExpandVert, "vertical", "vert")
                 .build();
+
 
         CommandSpec cmdRegionList = CommandSpec.builder()
                 .description(Text.of("No command description"))

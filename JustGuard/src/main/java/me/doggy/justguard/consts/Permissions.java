@@ -21,7 +21,9 @@ public class Permissions {
     public static final String COMMAND_REGION_CREATE = COMMAND_REGION_PREFIX + "create";
     public static final String COMMAND_REGION_SETBOUND = COMMAND_REGION_PREFIX + "setbound";
     public static final String COMMAND_REGION_CLAIM = COMMAND_REGION_PREFIX + "claim";
-    public static final String COMMAND_REGION_EXPAND = COMMAND_REGION_PREFIX + "expand";
+    public static final String COMMAND_REGION_EXPAND_PREFIX = COMMAND_REGION_PREFIX + "expand.";
+    public static final String COMMAND_REGION_EXPAND_BASE = COMMAND_REGION_EXPAND_PREFIX + "base";
+    public static final String COMMAND_REGION_EXPAND_VERT = COMMAND_REGION_EXPAND_PREFIX + "vert";
     public static final String COMMAND_REGION_LIST = COMMAND_REGION_PREFIX + "list";
     public static final String COMMAND_REGION_INFO = COMMAND_REGION_PREFIX + "info";
     public static final String COMMAND_REGION_SETOWNERSHIP = COMMAND_REGION_PREFIX + "setownership";
