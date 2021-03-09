@@ -8,20 +8,22 @@ import me.doggy.justguard.events.TestEventListener;
 import me.doggy.justguard.region.Region;
 import me.doggy.justguard.utils.RegionUtils;
 import me.doggy.justguard.utils.help.RegionPair;
+import net.luckperms.api.LuckPerms;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.event.EventManager;
-import org.spongepowered.api.event.game.state.GameInitializationEvent;
-import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
+import org.spongepowered.api.event.game.state.*;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.world.SaveWorldEvent;
+import org.spongepowered.api.plugin.Dependency;
 import org.spongepowered.api.plugin.Plugin;
+import org.spongepowered.api.service.ProviderRegistration;
+import org.spongepowered.api.world.World;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Plugin(
         id = JustGuard.PLUGIN_ID,
@@ -30,6 +32,9 @@ import java.util.Map;
         description = "It's Just Guard plugin",
         authors = {
                 "DoGGy"
+        },
+        dependencies = {
+                @Dependency(id = "luckperms", optional = false)
         }
 )
 public class JustGuard {
@@ -49,33 +54,62 @@ public class JustGuard {
     private Logger logger;
 
     private ConfigManager configManager;
+    private LuckPerms luckPerms;
 
     public static JustGuard getInstance() { return _instance; }
     public Logger getLogger() { return logger; }
     public ConfigManager getConfigManager() { return configManager; }
+    public LuckPerms getLuckPerms() { return luckPerms; }
+
+    @Listener
+    public void preInit(GameConstructionEvent event)
+    {
+        _instance = this;
+    }
 
     @Listener
     public void preInit(GamePreInitializationEvent event)
     {
-        _instance = this;
-
-        logger.info("   _   __  ");
-        logger.info("    |  | _  "+PLUGIN_NAME+" v"+PLUGIN_VERSION+" by DoGGy");
-        logger.info("  \\_|  \\__) Running on Sponge - SpongeForge");
-        logger.info("           ");
+        configManager = new ConfigManager(configDir);
+        configManager.loadConfig();
     }
 
     @Listener
     public void init(GameInitializationEvent event)
     {
-        configManager = new ConfigManager(configDir);
-        configManager.loadConfig();
-
         loadRegions();
-
         registerListeners();
+    }
+
+    @Listener
+    public void serverStarting(GameStartingServerEvent event)
+    {
         CommandsRegistrator.register();
     }
+
+    @Listener
+    public void loadComplete(GameLoadCompleteEvent event)
+    {
+        boolean loaded = false;
+        Optional<ProviderRegistration<LuckPerms>> provider = Sponge.getServiceManager().getRegistration(LuckPerms.class);
+        if (provider.isPresent()) {
+            luckPerms = provider.get().getProvider();
+            loaded = true;
+        }
+        else {
+            logger.error("LuckPerms api not found!");
+        }
+
+        if(loaded)
+        {
+            logger.info("   _   __  ");
+            logger.info("    |  | _  "+PLUGIN_NAME+" v"+PLUGIN_VERSION+" by DoGGy");
+            logger.info("  \\_|  \\__) Running on Sponge - SpongeForge");
+            logger.info("           ");
+        }
+
+    }
+
 
     private void registerListeners()
     {
@@ -119,13 +153,17 @@ public class JustGuard {
             String name = regionEntry.getKey();
             Region region = regionEntry.getValue();
 
-            if(region.getWorld().getName().equals(worldName))
+            World regionWorld = region.getWorld();
+            if(regionWorld != null && regionWorld.getName().equals(worldName))
             {
                 RegionUtils.save(new RegionPair(name, region));
             }
         }
         logger.debug("Finished saving regions in world '"+worldName+"'");
+
+
     }
+
 
     @Listener
     public void onWorldSave(SaveWorldEvent.Pre event)

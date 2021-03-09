@@ -1,12 +1,11 @@
 package me.doggy.justguard.command;
 
 import me.doggy.justguard.JustGuard;
-import me.doggy.justguard.command.region.CommandClaim;
-import me.doggy.justguard.command.region.CommandCreate;
-import me.doggy.justguard.command.region.CommandList;
-import me.doggy.justguard.command.region.CommandSetBound;
+import me.doggy.justguard.Pending;
+import me.doggy.justguard.command.region.*;
+import me.doggy.justguard.permission.Permissions;
 import me.doggy.justguard.region.Region;
-import me.doggy.justguard.Bounds;
+import me.doggy.justguard.utils.help.AABBBuilder;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
@@ -18,16 +17,16 @@ public class CommandsRegistrator {
     {
         CommandSpec cmdRegionCreate = CommandSpec.builder()
                 .description(Text.of("No command description"))
-                .permission("safeguard.command.region.create")
+                .permission(Permissions.COMMAND_REGION_CREATE)
                 .arguments(GenericArguments.world(Text.of("world")),
-                            GenericArguments.enumValue(Text.of("region-type"), Region.RegionType.class))
+                            GenericArguments.enumValue(Text.of("region-type"), Pending.RegionType.class))
                 .executor(new CommandCreate())
                 .build();
 
         CommandSpec cmdRegionSetBound = CommandSpec.builder()
                 .description(Text.of("No command description"))
-                .permission("safeguard.command.region.setbound")
-                .arguments(GenericArguments.enumValue(Text.of("type"), Bounds.BoundType.class),
+                .permission(Permissions.COMMAND_REGION_SETBOUND)
+                .arguments(GenericArguments.enumValue(Text.of("type"), AABBBuilder.BoundType.class),
                         GenericArguments.integer(Text.of("pos-x")),
                         GenericArguments.integer(Text.of("pos-y")),
                         GenericArguments.integer(Text.of("pos-z")))
@@ -36,25 +35,43 @@ public class CommandsRegistrator {
 
         CommandSpec cmdRegionClaim = CommandSpec.builder()
                 .description(Text.of("No command description"))
-                .permission("safeguard.command.region.claim")
+                .permission(Permissions.COMMAND_REGION_CLAIM)
                 .arguments(GenericArguments.string(Text.of("name")))
                 .executor(new CommandClaim())
                 .build();
 
         CommandSpec cmdRegionList = CommandSpec.builder()
                 .description(Text.of("No command description"))
-                .permission("safeguard.command.region.list")
+                .permission(Permissions.COMMAND_REGION_LIST)
                 .arguments(GenericArguments.optional(GenericArguments.integer(Text.of("page"))))
                 .executor(new CommandList())
                 .build();
 
+        CommandSpec cmdRegionInfo = CommandSpec.builder()
+                .description(Text.of("No command description"))
+                .permission(Permissions.COMMAND_REGION_INFO)
+                .arguments(GenericArguments.optional(GenericArguments.integer(Text.of("page"))))
+                .executor(new CommandInfo())
+                .build();
+
+        CommandSpec cmdRegionSetPlayerState = CommandSpec.builder()
+                .description(Text.of("No command description"))
+                .permission(Permissions.COMMAND_REGION_SETPLAYERSTATE)
+                .arguments(GenericArguments.string(Text.of("region-name")),
+                        GenericArguments.player(Text.of("player")),
+                        GenericArguments.enumValue(Text.of("state"), Region.PlayerState.class))
+                .executor(new CommandSetPlayerState())
+                .build();
+
         CommandSpec cmdRegion = CommandSpec.builder()
                 .description(Text.of("No command description"))
-                .permission("safeguard.command.region")
+                .permission(Permissions.COMMAND_REGION_BASE)
                 .child(cmdRegionCreate, "create")
                 .child(cmdRegionSetBound, "setbound")
                 .child(cmdRegionClaim, "claim")
                 .child(cmdRegionList, "list")
+                .child(cmdRegionInfo, "info")
+                .child(cmdRegionSetPlayerState, "setplayerstate")
                 //.child(cmdVersion, "addowner")
                 //.child(cmdVersion, "addmember")
                 //.child(cmdVersion, "removeowner")
@@ -64,29 +81,27 @@ public class CommandsRegistrator {
 
 
 
-
-
         CommandSpec cmdVersion = CommandSpec.builder()
                 .description(Text.of("No command description"))
-                .permission("safeguard.command.version")
+                .permission(Permissions.COMMAND_VERSION)
                 .executor(new CommandVersion())
                 .build();
 
         CommandSpec cmdReload = CommandSpec.builder()
                 .description(Text.of("No command description"))
-                .permission("safeguard.command.reload")
+                .permission(Permissions.COMMAND_RELOAD)
                 .executor(new CommandReload())
                 .build();
 
         CommandSpec cmdWand = CommandSpec.builder()
                 .description(Text.of("No command description"))
-                .permission("safeguard.command.wand")
+                .permission(Permissions.COMMAND_WAND)
                 .executor(new CommandWand())
                 .build();
 
         CommandSpec cmdJustGuard = CommandSpec.builder()
                 .description(Text.of("No command description"))
-                .permission("safeguard.command.justguard")
+                .permission(Permissions.COMMAND_BASE)
                 .executor(new CommandJustGuard())
                 .child(cmdVersion, "version")
                 .child(cmdReload, "reload")

@@ -6,8 +6,6 @@ import com.google.gson.GsonBuilder;
 import javafx.util.Pair;
 import me.doggy.justguard.JustGuard;
 import me.doggy.justguard.config.ConfigManager;
-import me.doggy.justguard.region.GlobalRegion;
-import me.doggy.justguard.region.LocalRegion;
 import me.doggy.justguard.region.Region;
 import me.doggy.justguard.utils.help.RegionPair;
 import ninja.leaping.configurate.ConfigurationNode;
@@ -16,15 +14,15 @@ import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import org.slf4j.Logger;
 import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.extent.Extent;
 
 import java.io.*;
 import java.lang.reflect.Type;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class RegionUtils {
 
@@ -33,25 +31,6 @@ public class RegionUtils {
 
     public static final String MAIN_FILE_NAME = "region";
     public static final String FLAGS_FILE_NAME = "flags";
-
-
-    private class RegionNull extends Region
-    {
-        public RegionNull(RegionType regionType, ConfigurationNode flags) {
-            super(regionType, flags);
-        }
-
-        @Override
-        public World getWorld() {
-            return null;
-        }
-
-        @Override
-        public <E extends World> boolean isInside(Location<E> location) {
-            return false;
-        }
-    }
-
 
     public static File getRegionsDirByWorld(String worldName)
     {
@@ -104,46 +83,26 @@ public class RegionUtils {
         return save(new RegionPair(name, region));
     }
 
-    public static RegionPair<Region> load(File directory)
+    public static RegionPair load(File directory)
     {
         File mainFile = new File(directory, MAIN_FILE_NAME);
         File flagsFile = new File(directory, FLAGS_FILE_NAME);
 
-        RegionPair<Region> result = null;
+        RegionPair result = null;
 
         Gson gson = new Gson();
         BufferedReader bufferedReader = null;
         try {
 
-            Type helpType = new TypeToken<RegionPair<RegionNull>>() {}.getType();
+            Type gsonType = new TypeToken<RegionPair>() {}.getType();
 
             bufferedReader = new BufferedReader(new FileReader(mainFile));
-            RegionPair<RegionNull> regionTypeHelpClassPair = gson.fromJson(bufferedReader, helpType);
-
-            bufferedReader.close();
-            bufferedReader = new BufferedReader(new FileReader(mainFile));
-
-            Type regionGsonType = null;
-            switch (regionTypeHelpClassPair.region.getRegionType())
-            {
-                case Local:
-                    regionGsonType = new TypeToken<RegionPair<LocalRegion>>() {}.getType();
-                    break;
-                case Global:
-                    regionGsonType = new TypeToken<RegionPair<GlobalRegion>>() {}.getType();
-                    break;
-                default:
-                    return null;
-            }
-
-
-            result = gson.fromJson(bufferedReader, regionGsonType);
+            result = gson.fromJson(bufferedReader, gsonType);
 
             ConfigurationLoader<CommentedConfigurationNode> loader =
                     HoconConfigurationLoader.builder().setPath(flagsFile.toPath()).build();
 
             ConfigurationNode flags = loader.load();
-
             result.region.setFlags(flags);
 
         } catch (IOException e) {
@@ -161,7 +120,79 @@ public class RegionUtils {
         return result;
     }
 
+    public static HashMap<String, Region> getAllRegions()
+    {
+        return JustGuard.REGIONS;
+    }
 
+    public static List<RegionPair> getRegionsInLocation(Location<World> location)
+    {
+        List<RegionPair> regions = new ArrayList<>();
+
+        for(Map.Entry<String, Region> regionEntry : getAllRegions().entrySet()) {
+            String name = regionEntry.getKey();
+            Region region = regionEntry.getValue();
+
+            /*logger.info("here1: "+name);
+            logger.info("here2: "+((LocalRegion)region).getBounds().getMin().toString());
+            logger.info("here3: "+((LocalRegion)region).getBounds().getMax().toString());
+            logger.info("here4: "+region.getWorld().getName().toString());
+            logger.info("here5: "+location.getPosition().toString());
+            logger.info("here6: "+location.getExtent().getName().toString());
+            logger.info("here7: "+String.valueOf(region.isInside(location)));*/
+
+            if(region.contains(location))
+            {
+                regions.add(new RegionPair(name, region));
+            }
+        }
+
+        return regions;
+    }
+    public static List<RegionPair> getMoreWeightableRegions(List<RegionPair> regions)
+    {
+        List<RegionPair> result = new ArrayList<>();
+
+        int weight = 0;
+        for (RegionPair regionPair : regions)
+        {
+            int currWeight = regionPair.region.getWeight();
+            if(currWeight > weight)
+            {
+                result.clear();
+                weight = currWeight;
+                result.add(regionPair);
+            }
+            else if (currWeight == weight)
+            {
+                result.add(regionPair);
+            }
+        }
+
+        return result;
+    }
+    //given region won't be in return list
+    public static List<RegionPair> getRegionsIntersectWith(Region region)
+    {
+        return getRegionsIntersectWith(region.getWorld(), region.getBounds());
+    }
+
+    public static List<RegionPair> getRegionsIntersectWith(World world, AABB bounds)
+    {
+        List<RegionPair> regions = new ArrayList<>();
+
+        for(Map.Entry<String, Region> regionEntry : getAllRegions().entrySet()) {
+            String name = regionEntry.getKey();
+            Region currRegion = regionEntry.getValue();
+
+            if(currRegion.intersects(world, bounds))
+            {
+                regions.add(new RegionPair(name, currRegion));
+            }
+        }
+
+        return regions;
+    }
 
 
 }

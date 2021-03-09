@@ -8,9 +8,14 @@ version = '1.0-SNAPSHOT'
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 
+repositories {
+    mavenCentral()
+}
+
 dependencies {
     compileOnly 'org.spongepowered:spongeapi:7.3.0'
     annotationProcessor 'org.spongepowered:spongeapi:7.3.0'
+    compileOnly 'net.luckperms:api:5.3'
 }
 
 sponge.plugin.id = 'justguard'

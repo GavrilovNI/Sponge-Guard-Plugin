@@ -17,18 +17,13 @@ public class CommandWand implements CommandExecutor
 
     public CommandResult execute(CommandSource src, CommandContext args)
     {
-        if (src instanceof Player) {
-            Player player = (Player) src;
-
-            InventoryUtils.addItemStackToInventory(player, InventoryUtils.GetSelector());
-
-            src.sendMessage(Text.of(TextManager.getText(Texts.CMD_ANSWER_WAND)));
-        }
-        else
-        {
-
+        if (!(src instanceof Player)) {
             src.sendMessage(Text.of(TextManager.getText(Texts.ERR_CMD_ONLY_FOR_PLAYERS)));
         }
+
+        Player player = (Player) src;
+        InventoryUtils.addItemStackToInventory(player, InventoryUtils.GetSelector());
+        src.sendMessage(Text.of(TextManager.getText(Texts.CMD_ANSWER_WAND)));
 
         return CommandResult.success();
     }

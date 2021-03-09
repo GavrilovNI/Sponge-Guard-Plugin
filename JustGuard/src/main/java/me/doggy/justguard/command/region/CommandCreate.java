@@ -1,5 +1,6 @@
 package me.doggy.justguard.command.region;
 
+import com.flowpowered.math.vector.Vector3d;
 import me.doggy.justguard.JustGuard;
 import me.doggy.justguard.config.ConfigManager;
 import me.doggy.justguard.config.TextManager;
@@ -8,6 +9,7 @@ import me.doggy.justguard.region.Region;
 import me.doggy.justguard.utils.FileUtils;
 import me.doggy.justguard.utils.MessageUtils;
 import me.doggy.justguard.Pending;
+import me.doggy.justguard.utils.help.PendingRegion;
 import ninja.leaping.configurate.ConfigurationNode;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandResult;
@@ -26,7 +28,7 @@ public class CommandCreate implements CommandExecutor
     public CommandResult execute(CommandSource src, CommandContext args)
     {
         Optional<WorldProperties> worldPropertiesOpt = args.getOne("world");
-        Optional<Region.RegionType> regionTypeOpt = args.getOne("region-type");
+        Optional<Pending.RegionType> regionTypeOpt = args.getOne("region-type");
 
         if(!worldPropertiesOpt.isPresent() || !regionTypeOpt.isPresent())
             return CommandResult.builder().successCount(0).build();
@@ -38,13 +40,13 @@ public class CommandCreate implements CommandExecutor
 
         World world = worldOpt.get();
         ConfigurationNode flags = JustGuard.getInstance().getConfigManager().getDefaultRegionFlags();
-        Region.RegionType regionType = regionTypeOpt.get();
 
-        Pending.createRegion(src, regionType, flags, world);
+        Pending.createRegion(src, regionTypeOpt.get(), flags, world);
+
+
 
         MessageUtils.Send(src, Text.of(TextManager.getText(
                 Texts.CMD_ANSWER_REGION_CREATED,
-                regionType.name().toLowerCase(),
                 world.getName()
         )));
 

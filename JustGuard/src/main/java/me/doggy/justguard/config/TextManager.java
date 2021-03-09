@@ -18,7 +18,7 @@ public class TextManager {
 
     public static String getText(String key)
     {
-        ConfigurationNode text = texts.getNode(key);
+        ConfigurationNode text = texts.getNode(key.toLowerCase());
         if(text.isVirtual())
             return key;
 

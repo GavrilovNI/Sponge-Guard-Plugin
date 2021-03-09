@@ -2,7 +2,6 @@ package me.doggy.justguard.events;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
-import me.doggy.justguard.Bounds;
 import me.doggy.justguard.JustGuard;
 import me.doggy.justguard.Pending;
 import me.doggy.justguard.config.TextManager;
@@ -10,6 +9,8 @@ import me.doggy.justguard.config.Texts;
 import me.doggy.justguard.region.Region;
 import me.doggy.justguard.utils.InventoryUtils;
 import me.doggy.justguard.utils.MessageUtils;
+import me.doggy.justguard.utils.help.AABBBuilder;
+import me.doggy.justguard.utils.help.PendingRegion;
 import ninja.leaping.configurate.ConfigurationNode;
 import org.spongepowered.api.data.type.HandType;
 import org.spongepowered.api.data.type.HandTypes;
@@ -26,24 +27,24 @@ public class EventRegionSelect {
 
     @Listener
     public void onLeftClick(InteractBlockEvent.Primary event, @First Player player){
-        if(onClick(player, event.getHandType(), Bounds.BoundType.First, event.getTargetBlock().getPosition()))
+        if(onClick(player, event.getHandType(), AABBBuilder.BoundType.First, event.getTargetBlock().getPosition()))
             event.setCancelled(true);
     }
     @Listener
     public void onLeftClick(InteractBlockEvent.Secondary event, @First Player player){
-        if(onClick(player, event.getHandType(), Bounds.BoundType.Second, event.getTargetBlock().getPosition()))
+        if(onClick(player, event.getHandType(), AABBBuilder.BoundType.Second, event.getTargetBlock().getPosition()))
             event.setCancelled(true);
     }
 
-    private boolean onClick(Player player, HandType handType, Bounds.BoundType boundType, Vector3i position)
+    private boolean onClick(Player player, HandType handType, AABBBuilder.BoundType boundType, Vector3i position)
     {
         if(shouldEventCause(player, handType))
         {
-            Region createdRegion = Pending.getRegion(player);
-            if(createdRegion == null || !createdRegion.getRegionType().equals(Region.RegionType.Local))
-                Pending.createRegion(player, Region.RegionType.Local, JustGuard.getInstance().getConfigManager().getDefaultRegionFlags(), player.getWorld());
-
-            Pending.setRegionBound(player, boundType, position.toDouble());
+            PendingRegion createdRegion = Pending.getRegion(player);
+            if(createdRegion == null) {
+                createdRegion = Pending.createRegion(player, Pending.RegionType.Local, JustGuard.getInstance().getConfigManager().getDefaultRegionFlags(), player.getWorld());
+            }
+            createdRegion.aabbBuilder.set(position.toDouble(), boundType);
 
             MessageUtils.Send(player, Text.of(TextManager.getText(
                     Texts.CMD_ANSWER_BOUND_SETTED,
