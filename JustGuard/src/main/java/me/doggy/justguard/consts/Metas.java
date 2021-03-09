@@ -1,4 +1,4 @@
-package me.doggy.justguard.permission;
+package me.doggy.justguard.consts;
 
 import me.doggy.justguard.JustGuard;
 

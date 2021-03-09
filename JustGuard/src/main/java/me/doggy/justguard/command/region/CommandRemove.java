@@ -3,8 +3,8 @@ package me.doggy.justguard.command.region;
 import me.doggy.justguard.JustGuard;
 import me.doggy.justguard.command.CommandsRegistrator;
 import me.doggy.justguard.config.TextManager;
-import me.doggy.justguard.config.Texts;
-import me.doggy.justguard.permission.Permissions;
+import me.doggy.justguard.consts.Texts;
+import me.doggy.justguard.consts.Permissions;
 import me.doggy.justguard.region.Region;
 import me.doggy.justguard.utils.MessageUtils;
 import org.spongepowered.api.command.CommandResult;
@@ -14,9 +14,6 @@ import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 public class CommandRemove implements CommandExecutor

@@ -1,15 +1,10 @@
 package me.doggy.justguard.command.region;
 
-import com.flowpowered.math.vector.Vector3d;
 import me.doggy.justguard.JustGuard;
-import me.doggy.justguard.config.ConfigManager;
 import me.doggy.justguard.config.TextManager;
-import me.doggy.justguard.config.Texts;
-import me.doggy.justguard.region.Region;
-import me.doggy.justguard.utils.FileUtils;
+import me.doggy.justguard.consts.Texts;
 import me.doggy.justguard.utils.MessageUtils;
 import me.doggy.justguard.Pending;
-import me.doggy.justguard.utils.help.PendingRegion;
 import ninja.leaping.configurate.ConfigurationNode;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandResult;

@@ -3,13 +3,14 @@ package me.doggy.justguard.command;
 import me.doggy.justguard.JustGuard;
 import me.doggy.justguard.Pending;
 import me.doggy.justguard.command.region.*;
-import me.doggy.justguard.permission.Permissions;
+import me.doggy.justguard.consts.Permissions;
 import me.doggy.justguard.region.Region;
 import me.doggy.justguard.utils.help.AABBBuilder;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.util.Direction;
 
 public class CommandsRegistrator {
 
@@ -41,6 +42,14 @@ public class CommandsRegistrator {
                 .permission(Permissions.COMMAND_REGION_CLAIM)
                 .arguments(GenericArguments.string(Text.of(REGION_ID)))
                 .executor(new CommandClaim())
+                .build();
+
+        CommandSpec cmdRegionExpand = CommandSpec.builder()
+                .description(Text.of("No command description"))
+                .permission(Permissions.COMMAND_REGION_EXPAND)
+                .arguments(GenericArguments.integer(Text.of("length")),
+                        GenericArguments.optional(GenericArguments.enumValue(Text.of("direction"), Direction.class)))
+                .executor(new CommandExpand())
                 .build();
 
         CommandSpec cmdRegionList = CommandSpec.builder()
@@ -79,6 +88,7 @@ public class CommandsRegistrator {
                 .child(cmdRegionCreate, "create")
                 .child(cmdRegionSetBound, "setbound")
                 .child(cmdRegionClaim, "claim")
+                .child(cmdRegionExpand, "expand")
                 .child(cmdRegionList, "list")
                 .child(cmdRegionInfo, "info")
                 .child(cmdRegionSetOwnership, "setownership")

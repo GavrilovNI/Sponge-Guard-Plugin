@@ -2,7 +2,7 @@ package me.doggy.justguard.command;
 
 import me.doggy.justguard.JustGuard;
 import me.doggy.justguard.config.TextManager;
-import me.doggy.justguard.config.Texts;
+import me.doggy.justguard.consts.Texts;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;

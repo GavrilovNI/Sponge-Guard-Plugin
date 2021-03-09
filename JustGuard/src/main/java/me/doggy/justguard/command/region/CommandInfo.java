@@ -1,11 +1,9 @@
 package me.doggy.justguard.command.region;
 
 import com.google.common.collect.Lists;
-import me.doggy.justguard.JustGuard;
 import me.doggy.justguard.command.CommandsRegistrator;
 import me.doggy.justguard.config.TextManager;
-import me.doggy.justguard.config.Texts;
-import me.doggy.justguard.region.Region;
+import me.doggy.justguard.consts.Texts;
 import me.doggy.justguard.utils.MessageUtils;
 import me.doggy.justguard.utils.RegionUtils;
 import me.doggy.justguard.utils.help.RegionPair;
@@ -15,12 +13,7 @@ import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColor;
-import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.util.AABB;
 
-import java.util.ArrayList;
-import java.util.Map;
 import java.util.List;
 import java.util.Optional;
 

@@ -1,9 +1,8 @@
 package me.doggy.justguard.utils;
 
 import com.flowpowered.math.vector.Vector3d;
-import me.doggy.justguard.JustGuard;
 import me.doggy.justguard.config.TextManager;
-import me.doggy.justguard.config.Texts;
+import me.doggy.justguard.consts.Texts;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;

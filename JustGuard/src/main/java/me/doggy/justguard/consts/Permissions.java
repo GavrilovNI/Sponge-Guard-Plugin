@@ -1,4 +1,4 @@
-package me.doggy.justguard.permission;
+package me.doggy.justguard.consts;
 
 import me.doggy.justguard.JustGuard;
 
@@ -21,6 +21,7 @@ public class Permissions {
     public static final String COMMAND_REGION_CREATE = COMMAND_REGION_PREFIX + "create";
     public static final String COMMAND_REGION_SETBOUND = COMMAND_REGION_PREFIX + "setbound";
     public static final String COMMAND_REGION_CLAIM = COMMAND_REGION_PREFIX + "claim";
+    public static final String COMMAND_REGION_EXPAND = COMMAND_REGION_PREFIX + "expand";
     public static final String COMMAND_REGION_LIST = COMMAND_REGION_PREFIX + "list";
     public static final String COMMAND_REGION_INFO = COMMAND_REGION_PREFIX + "info";
     public static final String COMMAND_REGION_SETOWNERSHIP = COMMAND_REGION_PREFIX + "setownership";
@@ -34,6 +35,7 @@ public class Permissions {
     public static final String REGION_REMOVE_ANY = REGION_PREFIX + "remove-any";
 
     private static final String REGION_CLAIM_PREFIX = REGION_PREFIX + "claim.";
+    public static final String REGION_CLAIM_INFINITE_SIZE = REGION_CLAIM_PREFIX + "infinite-size";
     //public static final String CAN_CLAIM_REGION_OF_TYPE_PREFIX = REGION_CLAIM_PREFIX + "type.";
 
     private static final String REGION_CLAIM_INTERSECTWITH_PREFIX = REGION_CLAIM_PREFIX + "intersectwith.";

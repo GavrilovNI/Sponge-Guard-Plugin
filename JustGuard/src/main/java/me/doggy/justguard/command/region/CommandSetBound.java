@@ -2,8 +2,7 @@ package me.doggy.justguard.command.region;
 
 import com.flowpowered.math.vector.Vector3d;
 import me.doggy.justguard.config.TextManager;
-import me.doggy.justguard.config.Texts;
-import me.doggy.justguard.region.Region;
+import me.doggy.justguard.consts.Texts;
 import me.doggy.justguard.utils.MessageUtils;
 import me.doggy.justguard.Pending;
 import me.doggy.justguard.utils.help.AABBBuilder;

@@ -4,9 +4,9 @@ import com.flowpowered.math.vector.Vector3d;
 import me.doggy.justguard.JustGuard;
 import me.doggy.justguard.command.CommandsRegistrator;
 import me.doggy.justguard.config.TextManager;
-import me.doggy.justguard.config.Texts;
-import me.doggy.justguard.permission.Metas;
-import me.doggy.justguard.permission.Permissions;
+import me.doggy.justguard.consts.Texts;
+import me.doggy.justguard.consts.Metas;
+import me.doggy.justguard.consts.Permissions;
 import me.doggy.justguard.region.Region;
 import me.doggy.justguard.utils.MathUtils;
 import me.doggy.justguard.utils.MessageUtils;
@@ -76,21 +76,23 @@ public class CommandClaim implements CommandExecutor
 
             AABB regionAABB = region.aabbBuilder.build();
 
-            LuckPerms luckPerms = JustGuard.getInstance().getLuckPerms();
-            User user = luckPerms.getUserManager().getUser(player.getUniqueId());
+            if(!player.hasPermission(Permissions.REGION_CLAIM_INFINITE_SIZE)) {
 
-            int maxSize = MathUtils.tryParseInt(user.getCachedData().getMetaData().getMetaValue(Metas.REGION_MAX_SIZE), 0);
-            Vector3d regionSize = regionAABB.getSize();
-            int regionVolume = (int)Math.ceil(regionSize.getX() * regionSize.getY() * regionSize.getZ());
+                LuckPerms luckPerms = JustGuard.getInstance().getLuckPerms();
+                User user = luckPerms.getUserManager().getUser(player.getUniqueId());
 
-            if(regionVolume > maxSize)
-            {
-                MessageUtils.SendError(source, Text.of(TextManager.getText(
-                        Texts.MAX_REGION_SIZE_VIOLATION,
-                        String.valueOf(regionSize),
-                        String.valueOf(maxSize)
-                )));
-                return false;
+                int maxSize = MathUtils.tryParseInt(user.getCachedData().getMetaData().getMetaValue(Metas.REGION_MAX_SIZE), 0);
+                Vector3d regionSize = regionAABB.getSize();
+                int regionVolume = (int) Math.ceil(regionSize.getX() * regionSize.getY() * regionSize.getZ());
+
+                if (regionVolume > maxSize) {
+                    MessageUtils.SendError(source, Text.of(TextManager.getText(
+                            Texts.MAX_REGION_SIZE_VIOLATION,
+                            String.valueOf(regionSize),
+                            String.valueOf(maxSize)
+                    )));
+                    return false;
+                }
             }
 
             List<RegionPair> intersectRegions = RegionUtils.getRegionsIntersectWith(region.world, regionAABB);

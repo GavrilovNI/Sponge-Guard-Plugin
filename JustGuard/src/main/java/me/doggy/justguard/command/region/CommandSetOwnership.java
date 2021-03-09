@@ -3,7 +3,7 @@ package me.doggy.justguard.command.region;
 import me.doggy.justguard.JustGuard;
 import me.doggy.justguard.command.CommandsRegistrator;
 import me.doggy.justguard.config.TextManager;
-import me.doggy.justguard.config.Texts;
+import me.doggy.justguard.consts.Texts;
 import me.doggy.justguard.region.Region;
 import me.doggy.justguard.utils.MessageUtils;
 import org.spongepowered.api.command.CommandResult;
