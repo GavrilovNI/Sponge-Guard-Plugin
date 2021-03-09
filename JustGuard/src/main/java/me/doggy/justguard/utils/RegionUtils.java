@@ -83,8 +83,7 @@ public class RegionUtils {
         return save(new RegionPair(name, region));
     }
 
-    public static RegionPair load(File directory)
-    {
+    public static RegionPair load(File directory) {
         File mainFile = new File(directory, MAIN_FILE_NAME);
         File flagsFile = new File(directory, FLAGS_FILE_NAME);
 
@@ -118,6 +117,16 @@ public class RegionUtils {
         }
 
         return result;
+    }
+
+    public static void removeRegionFromFiles(Region region)
+    {
+        File currDir = getRegionDir(region);
+        File mainFile = new File(currDir, MAIN_FILE_NAME);
+        File flagsFile = new File(currDir, FLAGS_FILE_NAME);
+        mainFile.delete();
+        flagsFile.delete();
+        currDir.delete();
     }
 
     public static HashMap<String, Region> getAllRegions()

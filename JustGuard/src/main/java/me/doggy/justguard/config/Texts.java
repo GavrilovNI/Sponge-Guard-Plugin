@@ -13,6 +13,7 @@ public class Texts
     public static final String ERR_CMD_ONLY_FOR_PLAYERS = "err-cmd-only-for-players";
     public static final String ERR_REGION_NOT_FOUND = "err-region-not-found";
     public static final String ERR_NOT_REGION_OWNER = "err-not-region-owner";
+    public static final String ERR_NO_REGION_FOUND = "err-noo-region-found";
 
 
     public static final String CMD_ANSWER_VERSION= "cmd-answer-version";
@@ -21,7 +22,9 @@ public class Texts
     public static final String CMD_ANSWER_REGION_CLAIMED= "cmd-answer-region-claimed";
     public static final String CMD_ANSWER_BOUND_SETTED= "cmd-answer-bound-setted";
     public static final String CMD_ANSWER_WAND= "cmd-answer-wand";
-    public static final String CMD_ANSWER_SETPLAYERSTATE= "cmd-answer-setplayerstate";
+    public static final String CMD_ANSWER_SETOWNERSHIP = "cmd-answer-setplayerstate";
+    public static final String CMD_ANSWER_REGION_REMOVED= "cmd-answer-region-removed";
+    public static final String CMD_ANSWER_REGIONS_SAVED= "cmd-answer-regions-saved";
 
 
     public static final String NO_PERMISSION= "no-permission";

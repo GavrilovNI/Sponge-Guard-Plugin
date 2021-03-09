@@ -1,6 +1,7 @@
 package me.doggy.justguard.command.region;
 
 import me.doggy.justguard.JustGuard;
+import me.doggy.justguard.command.CommandsRegistrator;
 import me.doggy.justguard.region.Region;
 import me.doggy.justguard.utils.MessageUtils;
 import org.spongepowered.api.command.CommandResult;
@@ -20,7 +21,7 @@ public class CommandList implements CommandExecutor
     {
         Map<String, Region> REGIONS = JustGuard.REGIONS;
 
-        Optional<Integer> pageOpt = args.getOne("page");
+        Optional<Integer> pageOpt = args.getOne(CommandsRegistrator.PAGE);
         final int pageLength = 10;
         int page = pageOpt.orElse(1);
 

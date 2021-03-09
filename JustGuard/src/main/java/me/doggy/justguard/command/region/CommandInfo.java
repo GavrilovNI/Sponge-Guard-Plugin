@@ -2,6 +2,7 @@ package me.doggy.justguard.command.region;
 
 import com.google.common.collect.Lists;
 import me.doggy.justguard.JustGuard;
+import me.doggy.justguard.command.CommandsRegistrator;
 import me.doggy.justguard.config.TextManager;
 import me.doggy.justguard.config.Texts;
 import me.doggy.justguard.region.Region;
@@ -31,7 +32,7 @@ public class CommandInfo implements CommandExecutor
             src.sendMessage(Text.of(TextManager.getText(Texts.ERR_CMD_ONLY_FOR_PLAYERS)));
         }
 
-        Optional<Integer> pageOpt = args.getOne("page");
+        Optional<Integer> pageOpt = args.getOne(CommandsRegistrator.PAGE);
         final int pageLength = 10;
         int page = pageOpt.orElse(1);
 

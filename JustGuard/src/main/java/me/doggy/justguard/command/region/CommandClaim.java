@@ -2,6 +2,7 @@ package me.doggy.justguard.command.region;
 
 import com.flowpowered.math.vector.Vector3d;
 import me.doggy.justguard.JustGuard;
+import me.doggy.justguard.command.CommandsRegistrator;
 import me.doggy.justguard.config.TextManager;
 import me.doggy.justguard.config.Texts;
 import me.doggy.justguard.permission.Metas;
@@ -33,7 +34,7 @@ public class CommandClaim implements CommandExecutor
 
     public CommandResult execute(CommandSource source, CommandContext args)
     {
-        Optional<String> nameOpt = args.getOne("name");
+        Optional<String> nameOpt = args.getOne(CommandsRegistrator.REGION_ID);
 
         if(!nameOpt.isPresent())
             return CommandResult.builder().successCount(0).build();

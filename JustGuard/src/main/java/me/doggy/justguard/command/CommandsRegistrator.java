@@ -13,6 +13,9 @@ import org.spongepowered.api.text.Text;
 
 public class CommandsRegistrator {
 
+    public static final String REGION_ID = "region-id";
+    public static final String PAGE = "page";
+
     public static void register()
     {
         CommandSpec cmdRegionCreate = CommandSpec.builder()
@@ -36,31 +39,38 @@ public class CommandsRegistrator {
         CommandSpec cmdRegionClaim = CommandSpec.builder()
                 .description(Text.of("No command description"))
                 .permission(Permissions.COMMAND_REGION_CLAIM)
-                .arguments(GenericArguments.string(Text.of("name")))
+                .arguments(GenericArguments.string(Text.of(REGION_ID)))
                 .executor(new CommandClaim())
                 .build();
 
         CommandSpec cmdRegionList = CommandSpec.builder()
                 .description(Text.of("No command description"))
                 .permission(Permissions.COMMAND_REGION_LIST)
-                .arguments(GenericArguments.optional(GenericArguments.integer(Text.of("page"))))
+                .arguments(GenericArguments.optional(GenericArguments.integer(Text.of(PAGE))))
                 .executor(new CommandList())
                 .build();
 
         CommandSpec cmdRegionInfo = CommandSpec.builder()
                 .description(Text.of("No command description"))
                 .permission(Permissions.COMMAND_REGION_INFO)
-                .arguments(GenericArguments.optional(GenericArguments.integer(Text.of("page"))))
+                .arguments(GenericArguments.optional(GenericArguments.integer(Text.of(PAGE))))
                 .executor(new CommandInfo())
                 .build();
 
-        CommandSpec cmdRegionSetPlayerState = CommandSpec.builder()
+        CommandSpec cmdRegionSetOwnership = CommandSpec.builder()
                 .description(Text.of("No command description"))
-                .permission(Permissions.COMMAND_REGION_SETPLAYERSTATE)
-                .arguments(GenericArguments.string(Text.of("region-name")),
+                .permission(Permissions.COMMAND_REGION_SETOWNERSHIP)
+                .arguments(GenericArguments.string(Text.of(REGION_ID)),
                         GenericArguments.player(Text.of("player")),
                         GenericArguments.enumValue(Text.of("state"), Region.PlayerState.class))
-                .executor(new CommandSetPlayerState())
+                .executor(new CommandSetOwnership())
+                .build();
+
+        CommandSpec cmdRegionRemove = CommandSpec.builder()
+                .description(Text.of("No command description"))
+                .permission(Permissions.COMMAND_REGION_REMOVE)
+                .arguments(GenericArguments.string(Text.of(REGION_ID)))
+                .executor(new CommandRemove())
                 .build();
 
         CommandSpec cmdRegion = CommandSpec.builder()
@@ -71,11 +81,8 @@ public class CommandsRegistrator {
                 .child(cmdRegionClaim, "claim")
                 .child(cmdRegionList, "list")
                 .child(cmdRegionInfo, "info")
-                .child(cmdRegionSetPlayerState, "setplayerstate")
-                //.child(cmdVersion, "addowner")
-                //.child(cmdVersion, "addmember")
-                //.child(cmdVersion, "removeowner")
-                //.child(cmdVersion, "removemember")
+                .child(cmdRegionSetOwnership, "setownership")
+                .child(cmdRegionRemove, "remove", "rem", "rm")
                 .build();
 
 
@@ -93,6 +100,12 @@ public class CommandsRegistrator {
                 .executor(new CommandReload())
                 .build();
 
+        CommandSpec cmdSave = CommandSpec.builder()
+                .description(Text.of("No command description"))
+                .permission(Permissions.COMMAND_SAVE)
+                .executor(new CommandSave())
+                .build();
+
         CommandSpec cmdWand = CommandSpec.builder()
                 .description(Text.of("No command description"))
                 .permission(Permissions.COMMAND_WAND)
@@ -105,6 +118,7 @@ public class CommandsRegistrator {
                 .executor(new CommandJustGuard())
                 .child(cmdVersion, "version")
                 .child(cmdReload, "reload")
+                .child(cmdSave, "save")
                 .child(cmdRegion, "region", "rg")
                 .child(cmdWand, "wand")
                 .build();

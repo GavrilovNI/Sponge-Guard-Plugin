@@ -1,6 +1,7 @@
 package me.doggy.justguard.command.region;
 
 import me.doggy.justguard.JustGuard;
+import me.doggy.justguard.command.CommandsRegistrator;
 import me.doggy.justguard.config.TextManager;
 import me.doggy.justguard.config.Texts;
 import me.doggy.justguard.region.Region;
@@ -12,17 +13,14 @@ import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
-public class CommandSetPlayerState implements CommandExecutor
+public class CommandSetOwnership implements CommandExecutor
 {
 
     public CommandResult execute(CommandSource src, CommandContext args)
     {
-        Optional<String> regionNameOpt = args.getOne("region-name");
+        Optional<String> regionNameOpt = args.getOne(CommandsRegistrator.REGION_ID);
         Optional<Player> playerToChangeOpt = args.getOne("player");
         Optional<Region.PlayerState> stateOpt = args.getOne("state");
 
@@ -44,7 +42,7 @@ public class CommandSetPlayerState implements CommandExecutor
 
         region.setPlayerState(playerToChangeOpt.get().getUniqueId(), stateOpt.get());
         MessageUtils.Send(src, Text.of(TextManager.getText(
-                Texts.CMD_ANSWER_SETPLAYERSTATE,
+                Texts.CMD_ANSWER_SETOWNERSHIP,
                 regionNameOpt.get(),
                 playerToChangeOpt.get().getName(),
                 TextManager.getText(stateOpt.get().name().toLowerCase())

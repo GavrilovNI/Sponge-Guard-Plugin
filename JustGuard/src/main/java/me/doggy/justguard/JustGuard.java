@@ -46,6 +46,7 @@ public class JustGuard {
     private static JustGuard _instance;
 
     public static HashMap<String, Region> REGIONS = new HashMap<>();
+    private static List<RegionPair> REGIONS_TO_REMOVE = new ArrayList<>();
 
     @Inject
     @ConfigDir(sharedRoot = false)
@@ -120,8 +121,7 @@ public class JustGuard {
 
     }
 
-    public void loadRegions()
-    {
+    public void loadRegions() {
         logger.debug("Started loading regions");
         File regionsDir = configManager.getRegionsDir();
         for (final File fileEntry : regionsDir.listFiles()) {
@@ -132,9 +132,7 @@ public class JustGuard {
         }
         logger.debug("Finished loading regions");
     }
-
-    public void loadRegionByWorld(String worldName)
-    {
+    public void loadRegionByWorld(String worldName) {
         logger.debug("Started loading regions in world '"+worldName+"'");
         File worldDir = RegionUtils.getRegionsDirByWorld(worldName);
         for (final File fileEntry : worldDir.listFiles()) {
@@ -145,9 +143,7 @@ public class JustGuard {
         }
         logger.debug("Finished loading regions in world '"+worldName+"'");
     }
-
-    public void saveRegionsByWorld(String worldName)
-    {
+    public void saveRegionsByWorld(String worldName) {
         logger.debug("Starting saving regions in world '"+worldName+"'");
         for(Map.Entry<String, Region> regionEntry : REGIONS.entrySet()) {
             String name = regionEntry.getKey();
@@ -159,9 +155,34 @@ public class JustGuard {
                 RegionUtils.save(new RegionPair(name, region));
             }
         }
+        for(RegionPair regionPair : REGIONS_TO_REMOVE) {
+            RegionUtils.removeRegionFromFiles(regionPair.region);
+        }
+        REGIONS_TO_REMOVE.clear();
         logger.debug("Finished saving regions in world '"+worldName+"'");
+    }
+    public void saveRegions() {
+        logger.debug("Starting saving regions.");
+        for(Map.Entry<String, Region> regionEntry : REGIONS.entrySet()) {
+            String name = regionEntry.getKey();
+            Region region = regionEntry.getValue();
+            RegionUtils.save(new RegionPair(name, region));
+        }
+        for(RegionPair regionPair : REGIONS_TO_REMOVE) {
+            RegionUtils.removeRegionFromFiles(regionPair.region);
+        }
+        REGIONS_TO_REMOVE.clear();
+        logger.debug("Finished saving regions.");
+    }
 
 
+    public boolean removeRegion(String name)
+    {
+        Region region = REGIONS.remove(name);
+        if(region == null)
+            return false;
+        REGIONS_TO_REMOVE.add(new RegionPair(name, region));
+        return false;
     }
 
 

@@ -11,6 +11,7 @@ public class Permissions {
     public static final String COMMAND_BASE = COMMAND_PREFIX + "base";
     public static final String COMMAND_VERSION = COMMAND_PREFIX + "version";
     public static final String COMMAND_RELOAD = COMMAND_PREFIX + "reload";
+    public static final String COMMAND_SAVE = COMMAND_PREFIX + "save";
     public static final String COMMAND_WAND = COMMAND_PREFIX + "wand";
 
 
@@ -22,10 +23,17 @@ public class Permissions {
     public static final String COMMAND_REGION_CLAIM = COMMAND_REGION_PREFIX + "claim";
     public static final String COMMAND_REGION_LIST = COMMAND_REGION_PREFIX + "list";
     public static final String COMMAND_REGION_INFO = COMMAND_REGION_PREFIX + "info";
-    public static final String COMMAND_REGION_SETPLAYERSTATE = COMMAND_REGION_PREFIX + "setplayerstate";
+    public static final String COMMAND_REGION_SETOWNERSHIP = COMMAND_REGION_PREFIX + "setownership";
+    public static final String COMMAND_REGION_REMOVE = COMMAND_REGION_PREFIX + "remove";
 
 
-    private static final String REGION_CLAIM_PREFIX = PREFIX + "region.claim.";
+
+
+    private static final String REGION_PREFIX = PREFIX + "region.";
+
+    public static final String REGION_REMOVE_ANY = REGION_PREFIX + "remove-any";
+
+    private static final String REGION_CLAIM_PREFIX = REGION_PREFIX + "claim.";
     //public static final String CAN_CLAIM_REGION_OF_TYPE_PREFIX = REGION_CLAIM_PREFIX + "type.";
 
     private static final String REGION_CLAIM_INTERSECTWITH_PREFIX = REGION_CLAIM_PREFIX + "intersectwith.";
