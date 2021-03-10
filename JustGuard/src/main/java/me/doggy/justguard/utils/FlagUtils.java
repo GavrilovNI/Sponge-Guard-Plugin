@@ -31,7 +31,7 @@ public class FlagUtils {
     {
         for (RegionPair regionPair : regions)
         {
-            if(regionPair.region.getPlayerFlag(player, path).getBoolean(false))
+            if(!regionPair.region.getPlayerFlag(player, path).getBoolean(false))
                 return false;
         }
         return true;

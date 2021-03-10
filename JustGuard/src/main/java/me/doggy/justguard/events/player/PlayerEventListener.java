@@ -16,6 +16,7 @@ import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.text.Text;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -26,7 +27,7 @@ public class PlayerEventListener {
 
     private boolean checkTransactions(Player player, List<Transaction<BlockSnapshot>> transactions, String ... flagPath)
     {
-        List<String> flagPathList = Arrays.asList(flagPath);
+        ArrayList<String> flagPathList = new ArrayList<>(Arrays.asList(flagPath));
 
         for(Transaction<BlockSnapshot> transaction : transactions)
         {
@@ -47,6 +48,8 @@ public class PlayerEventListener {
     @Listener
     public void onChangeBlockEventByPlayer_Break(ChangeBlockEvent.Break event, @First Player player)
     {
+        logger.info("ChangeBlockEvent.Break");
+
         List<Transaction<BlockSnapshot>> transactions = event.getTransactions();
 
         if(!checkTransactions(player, transactions, Flags.BLOCK_BREAK))
@@ -58,6 +61,8 @@ public class PlayerEventListener {
     @Listener
     public void onChangeBlockEventByPlayer_Place(ChangeBlockEvent.Place event, @First Player player)
     {
+        logger.info("ChangeBlockEvent.Place");
+
         List<Transaction<BlockSnapshot>> transactions = event.getTransactions();
 
         if(!checkTransactions(player, transactions, Flags.BLOCK_PLACE))
@@ -70,6 +75,8 @@ public class PlayerEventListener {
     @Listener
     public void onInteractEntityByPlayer_Primary(InteractEntityEvent.Primary event, @First Player player)
     {
+        logger.info("InteractEntityEvent.Primary");
+
         Entity targetEntity = event.getTargetEntity();
 
         String brokenBlockId = targetEntity.getType().getId();
@@ -86,6 +93,8 @@ public class PlayerEventListener {
     @Listener
     public void onInteractEntityByPlayer_Secondary(InteractEntityEvent.Secondary event, @First Player player)
     {
+        logger.info("InteractEntityEvent.Secondary");
+
         Entity targetEntity = event.getTargetEntity();
 
         String brokenBlockId = targetEntity.getType().getId();

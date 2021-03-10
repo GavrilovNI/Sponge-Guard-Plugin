@@ -101,22 +101,9 @@ public class Region<E extends World> {
         return FlagUtils.getFlag(flags, path);
     }
     public ConfigurationNode getPlayerFlag(Player player, @NonNull Collection<String> path) {
-        String playerStateKey;
-        switch (getPlayerOwnership(player.getUniqueId()))
-        {
-            case Owner:
-                playerStateKey = "owner";
-                break;
-            case Member:
-                playerStateKey = "member";
-                break;
-            default:
-                playerStateKey = "other";
-                break;
-        }
+        String playerStateKey = getPlayerOwnership(player.getUniqueId()).name().toLowerCase();
 
-
-        List<String> pathList =  Arrays.asList("player", playerStateKey);
+        ArrayList<String> pathList = new ArrayList(Arrays.asList("player", playerStateKey));
         pathList.addAll(path);
         return getFlag(pathList);
     }
