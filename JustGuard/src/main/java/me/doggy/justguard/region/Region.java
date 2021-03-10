@@ -1,6 +1,10 @@
 package me.doggy.justguard.region;
 
+import me.doggy.justguard.JustGuard;
 import me.doggy.justguard.utils.FileUtils;
+import me.doggy.justguard.utils.FlagUtils;
+import me.doggy.justguard.utils.help.GsonableWorld;
+import me.doggy.justguard.utils.help.MyAABB;
 import ninja.leaping.configurate.ConfigurationNode;
 import org.apache.commons.lang3.ArrayUtils;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -24,19 +28,17 @@ public class Region<E extends World> {
 
     protected UUID uuid;
 
-    transient private E world = null;
-    private UUID worldUUID;
-    private AABB bounds;
+    private GsonableWorld<E> world;
+    private MyAABB bounds;
 
     protected Map<UUID, PlayerOwnership> playerOwnerships;
     transient protected ConfigurationNode flags;
     protected int priority;
 
-    public Region(E world, AABB bounds, ConfigurationNode flags)
+    public Region(E world, MyAABB bounds, ConfigurationNode flags)
     {
-        this.world = world;
+        this.world = new GsonableWorld(world);
         this.bounds = bounds;
-        this.worldUUID = this.world.getUniqueId();
         this.uuid = UUID.randomUUID();
         this.playerOwnerships = new HashMap<>();
         this.flags = flags;
@@ -46,17 +48,15 @@ public class Region<E extends World> {
     public UUID getUUID() { return uuid; }
     public E getWorld()
     {
-        if(world == null)
-            world = (E) Sponge.getServer().getWorld(worldUUID).orElse(null);
-        return world;
+        return world.get();
     }
-    public AABB getBounds() {
+    public MyAABB getBounds() {
         return bounds;
     }
     public int getPriority() { return priority; }
 
 
-    public void setBounds(AABB bounds) {
+    public void setBounds(MyAABB bounds) {
         this.bounds = bounds;
     }
     public ConfigurationNode getFlags() { return flags; }
@@ -71,36 +71,36 @@ public class Region<E extends World> {
             playerOwnerships.put(uuid, value);
     }
 
-    public PlayerOwnership getPlayerOwnership(UUID uuid)
-    {
+    public PlayerOwnership getPlayerOwnership(UUID uuid) {
         return playerOwnerships.getOrDefault(uuid, PlayerOwnership.Stranger);
     }
+    public PlayerOwnership getPlayerOwnership(Player player) {
+        return getPlayerOwnership(player.getUniqueId());
+    }
+    public boolean isOwner(Player player) { return getPlayerOwnership(player).equals(PlayerOwnership.Owner); }
 
     public boolean contains(Location<World> location)
     {
-        if(!world.equals(location.getExtent()))
+        if(!this.getWorld().equals(location.getExtent()))
             return false;
         return bounds.contains(location.getPosition());
     }
     public boolean intersects(Region region)
     {
-        return intersects(region.world, region.bounds);
+        return intersects(region.world.get(), region.bounds);
     }
-    public boolean intersects(World world, AABB bounds)
+    public boolean intersects(World world, MyAABB bounds)
     {
-        if(!world.equals(world))
+        if(!this.world.equals(world))
             return false;
-        return bounds.intersects(bounds);
+        return this.bounds.intersects(bounds);
     }
 
-    public ConfigurationNode getFlag(@NonNull String @NonNull... path)
-    {
-        return getFlag(Arrays.asList(path));
+
+    public ConfigurationNode getFlag(@NonNull Collection<String> path) {
+        return FlagUtils.getFlag(flags, path);
     }
-    public ConfigurationNode getFlag(@NonNull Iterable<String> path) {
-        return FileUtils.getFlag(flags, path);
-    }
-    public ConfigurationNode getPlayerFlag(Player player, @NonNull String @NonNull... path) {
+    public ConfigurationNode getPlayerFlag(Player player, @NonNull Collection<String> path) {
         String playerStateKey;
         switch (getPlayerOwnership(player.getUniqueId()))
         {
@@ -116,8 +116,9 @@ public class Region<E extends World> {
         }
 
 
-        String[] pathPrefix = new String[] {"player", playerStateKey};
-        return getFlag(ArrayUtils.addAll(pathPrefix, path));
+        List<String> pathList =  Arrays.asList("player", playerStateKey);
+        pathList.addAll(path);
+        return getFlag(pathList);
     }
 
 

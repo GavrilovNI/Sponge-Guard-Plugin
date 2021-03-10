@@ -1,4 +1,4 @@
-package me.doggy.justguard.command.region;
+package me.doggy.justguard.command.region.pending;
 
 import com.flowpowered.math.vector.Vector3d;
 import me.doggy.justguard.JustGuard;

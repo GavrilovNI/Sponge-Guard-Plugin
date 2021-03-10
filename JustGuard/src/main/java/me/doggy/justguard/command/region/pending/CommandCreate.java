@@ -1,4 +1,4 @@
-package me.doggy.justguard.command.region;
+package me.doggy.justguard.command.region.pending;
 
 import me.doggy.justguard.JustGuard;
 import me.doggy.justguard.config.TextManager;

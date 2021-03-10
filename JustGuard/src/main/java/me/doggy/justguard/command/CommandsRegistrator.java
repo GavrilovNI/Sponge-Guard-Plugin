@@ -3,6 +3,11 @@ package me.doggy.justguard.command;
 import me.doggy.justguard.JustGuard;
 import me.doggy.justguard.Pending;
 import me.doggy.justguard.command.region.*;
+import me.doggy.justguard.command.region.CommandRemove;
+import me.doggy.justguard.command.region.modify.CommandSetFlag;
+import me.doggy.justguard.command.region.modify.CommandSetOwnership;
+import me.doggy.justguard.command.region.modify.CommandUnsetFlag;
+import me.doggy.justguard.command.region.pending.*;
 import me.doggy.justguard.consts.Permissions;
 import me.doggy.justguard.region.Region;
 import me.doggy.justguard.utils.help.AABBBuilder;
@@ -19,9 +24,10 @@ public class CommandsRegistrator {
 
     public static void register()
     {
+
         CommandSpec cmdRegionCreate = CommandSpec.builder()
                 .description(Text.of("No command description"))
-                .permission(Permissions.COMMAND_REGION_CREATE)
+                .permission(Permissions.COMMAND_REGION_PENDING_CREATE)
                 .arguments(GenericArguments.world(Text.of("world")),
                             GenericArguments.enumValue(Text.of("region-type"), Pending.RegionType.class))
                 .executor(new CommandCreate())
@@ -29,7 +35,7 @@ public class CommandsRegistrator {
 
         CommandSpec cmdRegionSetBound = CommandSpec.builder()
                 .description(Text.of("No command description"))
-                .permission(Permissions.COMMAND_REGION_SETBOUND)
+                .permission(Permissions.COMMAND_REGION_PENDING_SETBOUND)
                 .arguments(GenericArguments.enumValue(Text.of("type"), AABBBuilder.BoundType.class),
                         GenericArguments.integer(Text.of("pos-x")),
                         GenericArguments.integer(Text.of("pos-y")),
@@ -39,20 +45,20 @@ public class CommandsRegistrator {
 
         CommandSpec cmdRegionClaim = CommandSpec.builder()
                 .description(Text.of("No command description"))
-                .permission(Permissions.COMMAND_REGION_CLAIM)
+                .permission(Permissions.COMMAND_REGION_PENDING_CLAIM)
                 .arguments(GenericArguments.string(Text.of(REGION_ID)))
                 .executor(new CommandClaim())
                 .build();
 
         CommandSpec cmdRegionExpandVert = CommandSpec.builder()
                 .description(Text.of("No command description"))
-                .permission(Permissions.COMMAND_REGION_EXPAND_VERT)
+                .permission(Permissions.COMMAND_REGION_PENDING_EXPAND_VERT)
                 .executor(new CommandExpandVert())
                 .build();
 
         CommandSpec cmdRegionExpand = CommandSpec.builder()
                 .description(Text.of("No command description"))
-                .permission(Permissions.COMMAND_REGION_EXPAND_BASE)
+                .permission(Permissions.COMMAND_REGION_PENDING_EXPAND_BASE)
                 .arguments(GenericArguments.integer(Text.of("length")),
                         GenericArguments.optional(GenericArguments.enumValue(Text.of("direction"), Direction.class)))
                 .executor(new CommandExpand())
@@ -63,14 +69,16 @@ public class CommandsRegistrator {
         CommandSpec cmdRegionList = CommandSpec.builder()
                 .description(Text.of("No command description"))
                 .permission(Permissions.COMMAND_REGION_LIST)
-                .arguments(GenericArguments.optional(GenericArguments.integer(Text.of(PAGE))))
+                .arguments(GenericArguments.optional(GenericArguments.enumValue(Text.of("ownership"), Region.PlayerOwnership.class)),
+                        GenericArguments.optional(GenericArguments.integer(Text.of(PAGE))))
                 .executor(new CommandList())
                 .build();
 
         CommandSpec cmdRegionInfo = CommandSpec.builder()
                 .description(Text.of("No command description"))
                 .permission(Permissions.COMMAND_REGION_INFO)
-                .arguments(GenericArguments.optional(GenericArguments.integer(Text.of(PAGE))))
+                .arguments(GenericArguments.optional(GenericArguments.string(Text.of(REGION_ID))),
+                        GenericArguments.optional(GenericArguments.integer(Text.of(PAGE))))
                 .executor(new CommandInfo())
                 .build();
 
@@ -81,6 +89,22 @@ public class CommandsRegistrator {
                         GenericArguments.player(Text.of("player")),
                         GenericArguments.enumValue(Text.of("state"), Region.PlayerOwnership.class))
                 .executor(new CommandSetOwnership())
+                .build();
+
+        CommandSpec cmdRegionSetFlag = CommandSpec.builder()
+                .description(Text.of("No command description"))
+                .permission(Permissions.COMMAND_REGION_SETFLAG)
+                .arguments(GenericArguments.string(Text.of(REGION_ID)),
+                        GenericArguments.string(Text.of("flag")),
+                        GenericArguments.string(Text.of("value")))
+                .executor(new CommandSetFlag())
+                .build();
+        CommandSpec cmdRegionUnsetFlag = CommandSpec.builder()
+                .description(Text.of("No command description"))
+                .permission(Permissions.COMMAND_REGION_UNSETFLAG)
+                .arguments(GenericArguments.string(Text.of(REGION_ID)),
+                        GenericArguments.string(Text.of("flag")))
+                .executor(new CommandUnsetFlag())
                 .build();
 
         CommandSpec cmdRegionRemove = CommandSpec.builder()
@@ -101,6 +125,8 @@ public class CommandsRegistrator {
                 .child(cmdRegionInfo, "info")
                 .child(cmdRegionSetOwnership, "setownership")
                 .child(cmdRegionRemove, "remove", "rem", "rm")
+                .child(cmdRegionSetFlag, "setflag")
+                .child(cmdRegionUnsetFlag, "unsetflag")
                 .build();
 
 
@@ -123,6 +149,11 @@ public class CommandsRegistrator {
                 .permission(Permissions.COMMAND_SAVE)
                 .executor(new CommandSave())
                 .build();
+        CommandSpec cmdLoad = CommandSpec.builder()
+                .description(Text.of("No command description"))
+                .permission(Permissions.COMMAND_LOAD)
+                .executor(new CommandLoad())
+                .build();
 
         CommandSpec cmdWand = CommandSpec.builder()
                 .description(Text.of("No command description"))
@@ -137,6 +168,7 @@ public class CommandsRegistrator {
                 .child(cmdVersion, "version")
                 .child(cmdReload, "reload")
                 .child(cmdSave, "save")
+                .child(cmdLoad, "load")
                 .child(cmdRegion, "region", "rg")
                 .child(cmdWand, "wand")
                 .build();

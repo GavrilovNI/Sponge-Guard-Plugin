@@ -1,10 +1,11 @@
-package me.doggy.justguard.command.region;
+package me.doggy.justguard.command.region.modify;
 
 import me.doggy.justguard.JustGuard;
 import me.doggy.justguard.command.CommandsRegistrator;
 import me.doggy.justguard.config.TextManager;
 import me.doggy.justguard.consts.Texts;
 import me.doggy.justguard.region.Region;
+import me.doggy.justguard.utils.CommandUtils;
 import me.doggy.justguard.utils.MessageUtils;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -20,30 +21,22 @@ public class CommandSetOwnership implements CommandExecutor
 
     public CommandResult execute(CommandSource src, CommandContext args)
     {
-        Optional<String> regionNameOpt = args.getOne(CommandsRegistrator.REGION_ID);
+        Optional<String> regionIdOpt = args.getOne(CommandsRegistrator.REGION_ID);
         Optional<Player> playerToChangeOpt = args.getOne("player");
         Optional<Region.PlayerOwnership> stateOpt = args.getOne("state");
 
-        if(!regionNameOpt.isPresent()
-                || !playerToChangeOpt.isPresent()
-                || !stateOpt.isPresent())
+        if(!regionIdOpt.isPresent() || !playerToChangeOpt.isPresent() || !stateOpt.isPresent())
             return CommandResult.builder().successCount(0).build();
 
-        Region region = JustGuard.REGIONS.get(regionNameOpt.get());
-        if(region == null) {
-            MessageUtils.SendError(src, Text.of(TextManager.getText(Texts.ERR_NOT_REGION_OWNER)));
+        Region region = JustGuard.REGIONS.get(regionIdOpt.get());
+
+        if(!CommandUtils.canContinueModifyRegion(region, src, true))
             return CommandResult.success();
-        }
-        else if(src instanceof Player && !region.getPlayerOwnership(((Player) src).getUniqueId()).equals(Region.PlayerOwnership.Owner)) {
-            JustGuard.getInstance().getLogger().info(region.getPlayerOwnership(((Player) src).getUniqueId()).name());
-            MessageUtils.SendError(src, Text.of(TextManager.getText(Texts.ERR_NOT_REGION_OWNER)));
-            return CommandResult.success();
-        }
 
         region.setPlayerOwnership(playerToChangeOpt.get().getUniqueId(), stateOpt.get());
         MessageUtils.Send(src, Text.of(TextManager.getText(
                 Texts.CMD_ANSWER_SETOWNERSHIP,
-                regionNameOpt.get(),
+                regionIdOpt.get(),
                 playerToChangeOpt.get().getName(),
                 TextManager.getText(stateOpt.get().name().toLowerCase())
         )));

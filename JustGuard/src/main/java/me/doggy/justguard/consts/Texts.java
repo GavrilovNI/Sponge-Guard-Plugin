@@ -15,6 +15,8 @@ public class Texts
     public static final String ERR_NOT_REGION_OWNER = "err-not-region-owner";
     public static final String ERR_NO_REGION_FOUND = "err-noo-region-found";
     public static final String ERR_WRONG_DIRECTION_TO_EXPAND = "err-wrong-direction-to-expand";
+    public static final String ERR_CMD_TO_MUCH_ARGUMENTS = "err-cmd-to-much-arguments";
+    public static final String ERR_CMD_NOT_ENOUGH_ARGUMENTS = "err-cmd-not-enough-arguments";
 
 
     public static final String CMD_ANSWER_VERSION = "cmd-answer-version";
@@ -26,8 +28,10 @@ public class Texts
     public static final String CMD_ANSWER_SETOWNERSHIP = "cmd-answer-setplayerstate";
     public static final String CMD_ANSWER_REGION_REMOVED = "cmd-answer-region-removed";
     public static final String CMD_ANSWER_REGIONS_SAVED = "cmd-answer-regions-saved";
+    public static final String CMD_ANSWER_REGIONS_LOADED = "cmd-answer-regions-loaded";
     public static final String CMD_ANSWER_BOUNDS_EXPANDED = "cmd-answer-bounds-expanded";
     public static final String CMD_ANSWER_BOUNDS_EXPANDED_VERT = "cmd-answer-bounds-expanded-vert";
+    public static final String CMD_ANSWER_FLAG_CHANGED = "cmd-answer-flag-changed";
 
 
     public static final String NO_PERMISSION= "no-permission";
@@ -38,5 +42,11 @@ public class Texts
     public static final String MAX_REGION_SIZE_VIOLATION = "max-region-size-violation";
 
     public static final String DIRECTION_ALL = "all-directions";
+
+    public static final String UUID = "uuid";
+    public static final String MIN_POSITION = "min-position";
+    public static final String MAX_POSITION = "max-position";
+
+    public static final String YOU_CANT_DO_THIS = "you-cant-do-this";
 
 }

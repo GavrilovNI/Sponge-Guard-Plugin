@@ -2,6 +2,7 @@ package me.doggy.justguard.command;
 
 import me.doggy.justguard.config.TextManager;
 import me.doggy.justguard.consts.Texts;
+import me.doggy.justguard.utils.CommandUtils;
 import me.doggy.justguard.utils.InventoryUtils;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -15,8 +16,8 @@ public class CommandWand implements CommandExecutor
 
     public CommandResult execute(CommandSource src, CommandContext args)
     {
-        if (!(src instanceof Player)) {
-            src.sendMessage(Text.of(TextManager.getText(Texts.ERR_CMD_ONLY_FOR_PLAYERS)));
+        if(!CommandUtils.cmdOnlyForPlayers(src, true)) {
+            return CommandResult.success();
         }
 
         Player player = (Player) src;

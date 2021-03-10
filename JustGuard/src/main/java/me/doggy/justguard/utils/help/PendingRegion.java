@@ -13,10 +13,12 @@ public class PendingRegion{
     public ConfigurationNode flags;
     public World world;
     public AABBBuilder aabbBuilder = new AABBBuilder();
+    public int priority = 0;
 
     public Region build()
     {
         Region result = new Region(world, aabbBuilder.build(), flags);
+        result.setPriority(priority);
 
         return result;
     }

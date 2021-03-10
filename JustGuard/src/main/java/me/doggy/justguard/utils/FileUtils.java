@@ -25,11 +25,6 @@ import java.util.List;
 public class FileUtils {
 
     private static final Logger logger = JustGuard.getInstance().getLogger();
-    private static final ConfigManager configManager = JustGuard.getInstance().getConfigManager();
-
-    public static final String KEY_DEFAULT = "default";
-    public static final String KEY_INHERITS = "inherits";
-    public static final String KEY_VALUES = "values";
 
 
     public static boolean copyResource(String name, Path target, StandardCopyOption option) {
@@ -96,115 +91,9 @@ public class FileUtils {
         return true;
     }
 
-
-
     public static Set<Object> getInnerRootKeys(ConfigurationNode root) {
         return root.getChildrenMap().keySet();
     }
-
-    private static boolean containsInGroup(ConfigurationNode groupRoot, String name, String startInh) {
-
-        ConfigurationNode valuesNode = groupRoot.getNode(KEY_VALUES);
-        boolean contains = valuesNode.getList(x->x.toString()).contains(name);
-
-        if(contains)
-        {
-            return true;
-        }
-        else
-        {
-            ConfigurationNode inheritsNode = groupRoot.getNode(KEY_INHERITS);
-
-            if(inheritsNode.isVirtual())
-                return false;
-
-            String inheritsFromName = inheritsNode.getString();
-
-            if(startInh == null)
-                startInh = (String) ConfigUtils.getNodeKey(groupRoot);
-            else if (startInh == inheritsFromName)
-                return false;
-
-            ConfigurationNode inheritsFrom = groupRoot.getParent().getNode(inheritsFromName);
-            return containsInGroup(inheritsFrom, name, startInh);
-        }
-    }
-    public static boolean containsInGroup(ConfigurationNode groupRoot, String name) {
-        return containsInGroup(groupRoot, name, null);
-    }
-
-    private static ConfigurationNode getFlag(ConfigurationNode root, @NonNull Iterable<String> path, String startInh) {
-        String key = Iterables.getFirst(path, null);
-
-
-        ConfigurationNode result = root.getNode(key);
-        Iterable<String> innerPath = Iterables.skip(path, 1);
-
-        if(!result.isVirtual())
-        {
-            if(Iterables.size(path) == 1)
-            {
-                return result;
-            }
-            result = getFlag(result, innerPath, null);
-        }
-
-        if(result.isVirtual())
-        {
-            Map<Object, ConfigurationNode> groups = (Map<Object, ConfigurationNode>) configManager.getGroups().getChildrenMap();
-
-            for(Map.Entry<Object, ConfigurationNode> entry : groups.entrySet()) {
-                String groupName = (String) entry.getKey();
-
-                ConfigurationNode groupValueNode = root.getNode(groupName);
-                if(groupValueNode.isVirtual() || !containsInGroup(entry.getValue(), key))
-                    continue;
-
-                result = groupValueNode;
-                break;
-            }
-
-            if(result.isVirtual())
-                result = root.getNode(KEY_DEFAULT);
-
-            if(!result.isVirtual())
-            {
-                return result;
-            }
-            else
-            {
-                result = root.getNode(KEY_INHERITS);
-
-                if(result.isVirtual())
-                    return result;
-
-                String inheritsFromName = result.getString();
-
-                if(startInh == null)
-                {
-                    startInh = (String) ConfigUtils.getNodeKey(root);
-                }
-                if (startInh == inheritsFromName)
-                {
-                    return result;
-                }
-
-                ConfigurationNode inheritsFrom = root.getParent().getNode(inheritsFromName);
-                return getFlag(inheritsFrom, path, startInh);
-            }
-        }
-        else
-        {
-            return result;
-        }
-    }
-    public static ConfigurationNode getFlag(ConfigurationNode root, @NonNull Iterable<String> path) {
-        return getFlag(root, path, null);
-    }
-    public static ConfigurationNode getFlag(ConfigurationNode root, String ... path) {
-        return getFlag(root, Arrays.asList(path), null);
-    }
-
 
 
 }

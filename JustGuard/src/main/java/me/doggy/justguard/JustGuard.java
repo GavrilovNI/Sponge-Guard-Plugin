@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import me.doggy.justguard.command.CommandsRegistrator;
 import me.doggy.justguard.config.ConfigManager;
 import me.doggy.justguard.events.EventRegionSelect;
-import me.doggy.justguard.events.TestEventListener;
+import me.doggy.justguard.events.player.PlayerEventListener;
 import me.doggy.justguard.region.Region;
 import me.doggy.justguard.utils.RegionUtils;
 import me.doggy.justguard.utils.help.RegionPair;
@@ -116,9 +116,10 @@ public class JustGuard {
     {
         EventManager eventManager = Sponge.getEventManager();
 
-        eventManager.registerListeners(this, new TestEventListener());
         eventManager.registerListeners(this, new EventRegionSelect());
 
+        //player listeners
+        eventManager.registerListeners(this, new PlayerEventListener());
     }
 
     public void loadRegions() {

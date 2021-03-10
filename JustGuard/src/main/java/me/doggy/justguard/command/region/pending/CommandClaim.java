@@ -1,4 +1,4 @@
-package me.doggy.justguard.command.region;
+package me.doggy.justguard.command.region.pending;
 
 import com.flowpowered.math.vector.Vector3d;
 import me.doggy.justguard.JustGuard;
@@ -12,6 +12,7 @@ import me.doggy.justguard.utils.MathUtils;
 import me.doggy.justguard.utils.MessageUtils;
 import me.doggy.justguard.Pending;
 import me.doggy.justguard.utils.RegionUtils;
+import me.doggy.justguard.utils.help.MyAABB;
 import me.doggy.justguard.utils.help.PendingRegion;
 import me.doggy.justguard.utils.help.RegionPair;
 import net.luckperms.api.LuckPerms;
@@ -74,7 +75,7 @@ public class CommandClaim implements CommandExecutor
         {
             Player player = (Player) source;
 
-            AABB regionAABB = region.aabbBuilder.build();
+            MyAABB regionAABB = region.aabbBuilder.build();
 
             if(!player.hasPermission(Permissions.REGION_CLAIM_INFINITE_SIZE)) {
 

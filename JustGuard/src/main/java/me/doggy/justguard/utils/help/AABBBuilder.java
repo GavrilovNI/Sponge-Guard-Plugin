@@ -2,7 +2,6 @@ package me.doggy.justguard.utils.help;
 
 import com.flowpowered.math.vector.Vector3d;
 import me.doggy.justguard.JustGuard;
-import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.util.Direction;
 
 import java.util.Arrays;
@@ -89,11 +88,11 @@ public class AABBBuilder {
         return this;
     }
 
-    public AABB build()
+    public MyAABB build()
     {
         Vector3d a = firstCorner.min(secondCorner);
         Vector3d b = firstCorner.max(secondCorner).add(Vector3d.ONE);
-        return new AABB(a, b);
+        return new MyAABB(a, b);
     }
 
 }

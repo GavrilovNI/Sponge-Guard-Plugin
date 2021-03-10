@@ -38,6 +38,7 @@ public class Pending {
         {
             pendingRegion.aabbBuilder.setFirst(new Vector3d(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY));
             pendingRegion.aabbBuilder.setSecond(new Vector3d(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY));
+            pendingRegion.priority = Integer.MIN_VALUE;
         }
 
         regions.put(source, pendingRegion);

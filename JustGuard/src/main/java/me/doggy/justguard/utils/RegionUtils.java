@@ -5,13 +5,17 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import me.doggy.justguard.JustGuard;
 import me.doggy.justguard.config.ConfigManager;
+import me.doggy.justguard.consts.Permissions;
 import me.doggy.justguard.region.Region;
+import me.doggy.justguard.utils.help.MyAABB;
 import me.doggy.justguard.utils.help.RegionPair;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import org.slf4j.Logger;
+import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -123,20 +127,21 @@ public class RegionUtils {
     public static HashMap<String, Region> getAllRegions() {
         return JustGuard.REGIONS;
     }
+    public static List<RegionPair> swapToList(Map<String, Region> regions) {
+        List<RegionPair> result = new ArrayList<>();
+        for(Map.Entry<String, Region> entry : regions.entrySet())
+        {
+            result.add(new RegionPair(entry.getKey(), entry.getValue()));
+        }
+        return result;
+    }
+
     public static List<RegionPair> getRegionsInLocation(Location<World> location) {
         List<RegionPair> regions = new ArrayList<>();
 
         for(Map.Entry<String, Region> regionEntry : getAllRegions().entrySet()) {
             String name = regionEntry.getKey();
             Region region = regionEntry.getValue();
-
-            /*logger.info("here1: "+name);
-            logger.info("here2: "+((LocalRegion)region).getBounds().getMin().toString());
-            logger.info("here3: "+((LocalRegion)region).getBounds().getMax().toString());
-            logger.info("here4: "+region.getWorld().getName().toString());
-            logger.info("here5: "+location.getPosition().toString());
-            logger.info("here6: "+location.getExtent().getName().toString());
-            logger.info("here7: "+String.valueOf(region.isInside(location)));*/
 
             if(region.contains(location))
             {
@@ -146,20 +151,21 @@ public class RegionUtils {
 
         return regions;
     }
+
     public static List<RegionPair> getHighestPriorityRegions(List<RegionPair> regions) {
         List<RegionPair> result = new ArrayList<>();
 
-        int weight = 0;
+        int priority = 0;
         for (RegionPair regionPair : regions)
         {
             int currWeight = regionPair.region.getPriority();
-            if(currWeight > weight)
+            if(currWeight > priority)
             {
                 result.clear();
-                weight = currWeight;
+                priority = currWeight;
                 result.add(regionPair);
             }
-            else if (currWeight == weight)
+            else if (currWeight == priority)
             {
                 result.add(regionPair);
             }
@@ -167,9 +173,20 @@ public class RegionUtils {
 
         return result;
     }
+    public static List<RegionPair> getRegionsByOwnership(List<RegionPair> regions, Player player, Region.PlayerOwnership ownership) {
+        List<RegionPair> result = new ArrayList<>();
+
+        for (RegionPair regionPair : regions)
+        {
+            if(regionPair.region.getPlayerOwnership(player).equals(ownership))
+                result.add(regionPair);
+        }
+
+        return result;
+    }
 
     //given region won't be in return list
-    public static List<RegionPair> getRegionsIntersectWith(World world, AABB bounds) {
+    public static List<RegionPair> getRegionsIntersectWith(World world, MyAABB bounds) {
         List<RegionPair> regions = new ArrayList<>();
 
         for(Map.Entry<String, Region> regionEntry : getAllRegions().entrySet()) {
@@ -186,6 +203,17 @@ public class RegionUtils {
     }
     public static List<RegionPair> getRegionsIntersectWith(Region region) {
         return getRegionsIntersectWith(region.getWorld(), region.getBounds());
+    }
+
+    public static boolean canModify(Region region, CommandSource source)
+    {
+        if(source.hasPermission(Permissions.CAN_MODIFY_NON_OWNING_REGIONS))
+            return true;
+
+        if(source instanceof Player)
+            return region.isOwner((Player) source);
+
+        return false;
     }
 
 }

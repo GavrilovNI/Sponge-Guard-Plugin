@@ -3,14 +3,16 @@ package me.doggy.justguard.command.region;
 import me.doggy.justguard.JustGuard;
 import me.doggy.justguard.command.CommandsRegistrator;
 import me.doggy.justguard.region.Region;
+import me.doggy.justguard.utils.CommandUtils;
 import me.doggy.justguard.utils.MessageUtils;
+import me.doggy.justguard.utils.RegionUtils;
+import me.doggy.justguard.utils.help.RegionPair;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColor;
-import org.spongepowered.api.text.format.TextColors;
 
 import java.util.*;
 
@@ -21,24 +23,26 @@ public class CommandList implements CommandExecutor
     {
         Map<String, Region> REGIONS = JustGuard.REGIONS;
 
+
+        Optional<Region.PlayerOwnership> ownershipOpt = args.getOne("ownership");
         Optional<Integer> pageOpt = args.getOne(CommandsRegistrator.PAGE);
+
+
         final int pageLength = 10;
         int page = pageOpt.orElse(1);
 
-        List<String> namesList = new ArrayList<String>(REGIONS.keySet());
+        List<RegionPair> regions = RegionUtils.swapToList(RegionUtils.getAllRegions());
 
-        MessageUtils.SendList(src, namesList, page, pageLength/*, (key)->{
-            Region region = REGIONS.get(key);
+        if(ownershipOpt.isPresent())
+        {
+            if(CommandUtils.cmdOnlyForPlayers(src, true))
+                return CommandResult.success();
 
-            TextColor nameColor = TextColors.RED;
-            Region.RegionType regionType = region.getRegionType();
-            if (regionType.equals(Region.RegionType.Global))
-                nameColor = TextColors.GREEN;
-            else if (regionType.equals(Region.RegionType.Local))
-                nameColor = TextColors.WHITE;
+            regions = RegionUtils.getRegionsByOwnership(regions, (Player) src, ownershipOpt.get());
+        }
 
-            return Text.of(nameColor, key);
-        }*/);
+        MessageUtils.SendList(src, Arrays.asList(regions.toArray()), page, pageLength, (key) -> { return Text.of(((RegionPair)key).name); });
+
 
         return CommandResult.success();
     }
