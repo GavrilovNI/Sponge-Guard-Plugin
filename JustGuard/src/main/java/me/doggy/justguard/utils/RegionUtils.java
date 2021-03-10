@@ -3,7 +3,6 @@ package me.doggy.justguard.utils;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import javafx.util.Pair;
 import me.doggy.justguard.JustGuard;
 import me.doggy.justguard.config.ConfigManager;
 import me.doggy.justguard.region.Region;
@@ -13,15 +12,12 @@ import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import org.slf4j.Logger;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
-import org.spongepowered.api.world.extent.Extent;
 
 import java.io.*;
 import java.lang.reflect.Type;
-import java.nio.file.Path;
 import java.util.*;
 
 public class RegionUtils {
@@ -32,13 +28,11 @@ public class RegionUtils {
     public static final String MAIN_FILE_NAME = "region";
     public static final String FLAGS_FILE_NAME = "flags";
 
-    public static File getRegionsDirByWorld(String worldName)
-    {
+    public static File getRegionsDirByWorld(String worldName) {
         File regionsDir = configManager.getRegionsDir();
         return new File(regionsDir, worldName);
     }
-    public static File getRegionDir(Region region)
-    {
+    public static File getRegionDir(Region region) {
         File worldDir = getRegionsDirByWorld(region.getWorld().getName());
         return new File(worldDir, region.getUUID().toString());
     }
@@ -82,7 +76,6 @@ public class RegionUtils {
     public static boolean save(String name, Region region) {
         return save(new RegionPair(name, region));
     }
-
     public static RegionPair load(File directory) {
         File mainFile = new File(directory, MAIN_FILE_NAME);
         File flagsFile = new File(directory, FLAGS_FILE_NAME);
@@ -118,9 +111,7 @@ public class RegionUtils {
 
         return result;
     }
-
-    public static void removeRegionFromFiles(Region region)
-    {
+    public static void removeRegionFromFiles(Region region) {
         File currDir = getRegionDir(region);
         File mainFile = new File(currDir, MAIN_FILE_NAME);
         File flagsFile = new File(currDir, FLAGS_FILE_NAME);
@@ -129,13 +120,10 @@ public class RegionUtils {
         currDir.delete();
     }
 
-    public static HashMap<String, Region> getAllRegions()
-    {
+    public static HashMap<String, Region> getAllRegions() {
         return JustGuard.REGIONS;
     }
-
-    public static List<RegionPair> getRegionsInLocation(Location<World> location)
-    {
+    public static List<RegionPair> getRegionsInLocation(Location<World> location) {
         List<RegionPair> regions = new ArrayList<>();
 
         for(Map.Entry<String, Region> regionEntry : getAllRegions().entrySet()) {
@@ -158,14 +146,13 @@ public class RegionUtils {
 
         return regions;
     }
-    public static List<RegionPair> getMoreWeightableRegions(List<RegionPair> regions)
-    {
+    public static List<RegionPair> getHighestPriorityRegions(List<RegionPair> regions) {
         List<RegionPair> result = new ArrayList<>();
 
         int weight = 0;
         for (RegionPair regionPair : regions)
         {
-            int currWeight = regionPair.region.getWeight();
+            int currWeight = regionPair.region.getPriority();
             if(currWeight > weight)
             {
                 result.clear();
@@ -180,14 +167,9 @@ public class RegionUtils {
 
         return result;
     }
-    //given region won't be in return list
-    public static List<RegionPair> getRegionsIntersectWith(Region region)
-    {
-        return getRegionsIntersectWith(region.getWorld(), region.getBounds());
-    }
 
-    public static List<RegionPair> getRegionsIntersectWith(World world, AABB bounds)
-    {
+    //given region won't be in return list
+    public static List<RegionPair> getRegionsIntersectWith(World world, AABB bounds) {
         List<RegionPair> regions = new ArrayList<>();
 
         for(Map.Entry<String, Region> regionEntry : getAllRegions().entrySet()) {
@@ -202,6 +184,8 @@ public class RegionUtils {
 
         return regions;
     }
-
+    public static List<RegionPair> getRegionsIntersectWith(Region region) {
+        return getRegionsIntersectWith(region.getWorld(), region.getBounds());
+    }
 
 }

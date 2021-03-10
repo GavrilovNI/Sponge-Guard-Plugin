@@ -1,8 +1,6 @@
 package me.doggy.justguard.region;
 
-import com.flowpowered.math.vector.Vector3d;
-import com.google.common.collect.Iterables;
-import me.doggy.justguard.utils.ConfigUtils;
+import me.doggy.justguard.utils.FileUtils;
 import ninja.leaping.configurate.ConfigurationNode;
 import org.apache.commons.lang3.ArrayUtils;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -15,48 +13,36 @@ import org.spongepowered.api.world.World;
 
 import java.util.*;
 
-import static java.util.Objects.requireNonNull;
-
 public class Region<E extends World> {
 
-    public enum PlayerState
+    public enum PlayerOwnership
     {
         Owner,
         Member,
         Stranger
     }
-    /*public enum RegionType
-    {
-        Global,
-        Local
-    }*/
 
-
-    //protected final RegionType regionType;
     protected UUID uuid;
 
     transient private E world = null;
-    private AABB bounds;
     private UUID worldUUID;
+    private AABB bounds;
 
-    protected Map<UUID, PlayerState> playerStates;
+    protected Map<UUID, PlayerOwnership> playerOwnerships;
     transient protected ConfigurationNode flags;
-    protected int weight;
-    //protected String name;
+    protected int priority;
 
-    public Region(/*RegionType regionType, */E world, AABB bounds, ConfigurationNode flags)
+    public Region(E world, AABB bounds, ConfigurationNode flags)
     {
-        //this.regionType = regionType;
         this.world = world;
         this.bounds = bounds;
         this.worldUUID = this.world.getUniqueId();
         this.uuid = UUID.randomUUID();
-        this.playerStates = new HashMap<>();
+        this.playerOwnerships = new HashMap<>();
         this.flags = flags;
-        this.weight = 0;
+        this.priority = 0;
     }
 
-    //public RegionType getRegionType() { return regionType; }
     public UUID getUUID() { return uuid; }
     public E getWorld()
     {
@@ -67,7 +53,7 @@ public class Region<E extends World> {
     public AABB getBounds() {
         return bounds;
     }
-    public int getWeight() { return weight; }
+    public int getPriority() { return priority; }
 
 
     public void setBounds(AABB bounds) {
@@ -75,19 +61,19 @@ public class Region<E extends World> {
     }
     public ConfigurationNode getFlags() { return flags; }
     public void setFlags(ConfigurationNode flags) { this.flags = flags; }
-    public void setWeight(int weight) { this.weight = weight; }
+    public void setPriority(int priority) { this.priority = priority; }
 
-    public void setPlayerState(UUID uuid, PlayerState playerState)
+    public void setPlayerOwnership(UUID uuid, PlayerOwnership value)
     {
-        if(playerState.equals(PlayerState.Stranger))
-            playerStates.remove(uuid);
+        if(value.equals(PlayerOwnership.Stranger))
+            playerOwnerships.remove(uuid);
         else
-            playerStates.put(uuid, playerState);
+            playerOwnerships.put(uuid, value);
     }
 
-    public PlayerState getPlayerState(UUID uuid)
+    public PlayerOwnership getPlayerOwnership(UUID uuid)
     {
-        return playerStates.getOrDefault(uuid, PlayerState.Stranger);
+        return playerOwnerships.getOrDefault(uuid, PlayerOwnership.Stranger);
     }
 
     public boolean contains(Location<World> location)
@@ -107,77 +93,16 @@ public class Region<E extends World> {
         return bounds.intersects(bounds);
     }
 
-
-
-    private static final String FLAG_DEFAULT_KEY = "default";
-    private static final String FLAG_INHERITS_KEY = "inherits";
-
-
-    private ConfigurationNode getFlag(ConfigurationNode root, @NonNull Iterable<String> path) {
-        return getFlag(root, path, null);
-    }
-    private ConfigurationNode getFlag(ConfigurationNode root, @NonNull Iterable<String> path, String startInh) {
-        String key = Iterables.getFirst(path, null);
-
-
-        ConfigurationNode result = root.getNode(key);
-        Iterable<String> innerPath = Iterables.skip(path, 1);
-
-        if(!result.isVirtual())
-        {
-            if(Iterables.size(path) == 1)
-            {
-                return result;
-            }
-            result = getFlag(result, innerPath, null);
-        }
-
-        if(result.isVirtual())
-        {
-            result = root.getNode(FLAG_DEFAULT_KEY);
-            if(!result.isVirtual())
-            {
-                return result;
-            }
-            else
-            {
-                result = root.getNode(FLAG_INHERITS_KEY);
-
-                if(result.isVirtual())
-                    return result;
-
-                String inheritsFromName = result.getString();
-
-                if(startInh == null)
-                {
-                    startInh = (String) ConfigUtils.getNodeKey(root);
-                }
-                if (startInh == inheritsFromName)
-                {
-                    return result;
-                }
-
-                ConfigurationNode inheritsFrom = root.getParent().getNode(inheritsFromName);
-                return getFlag(inheritsFrom, path, startInh);
-            }
-        }
-        else
-        {
-            return result;
-        }
-    }
-
     public ConfigurationNode getFlag(@NonNull String @NonNull... path)
     {
         return getFlag(Arrays.asList(path));
     }
-    public ConfigurationNode getFlag(@NonNull Iterable<String> path)
-    {
-        return getFlag(flags, path);
+    public ConfigurationNode getFlag(@NonNull Iterable<String> path) {
+        return FileUtils.getFlag(flags, path);
     }
     public ConfigurationNode getPlayerFlag(Player player, @NonNull String @NonNull... path) {
         String playerStateKey;
-        switch (getPlayerState(player.getUniqueId()))
+        switch (getPlayerOwnership(player.getUniqueId()))
         {
             case Owner:
                 playerStateKey = "owner";

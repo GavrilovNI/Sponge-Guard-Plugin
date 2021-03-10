@@ -56,7 +56,7 @@ public class CommandClaim implements CommandExecutor
                     if(source instanceof Player)
                     {
                         Region uploadedRegion = JustGuard.REGIONS.get(name);
-                        uploadedRegion.setPlayerState(((Player) source).getUniqueId(), Region.PlayerState.Owner);
+                        uploadedRegion.setPlayerOwnership(((Player) source).getUniqueId(), Region.PlayerOwnership.Owner);
                     }
                 }
                 else {
@@ -99,7 +99,7 @@ public class CommandClaim implements CommandExecutor
             for (RegionPair regionPair : intersectRegions)
             {
                 //intersect with, check for ownership
-                String playerStateStr = regionPair.region.getPlayerState(player.getUniqueId()).name().toLowerCase();
+                String playerStateStr = regionPair.region.getPlayerOwnership(player.getUniqueId()).name().toLowerCase();
                 if(!player.hasPermission(Permissions.CAN_INTERSECT_REGION_WITH_OWNERSHIP_PREFIX + playerStateStr))
                 {
                     MessageUtils.SendError(source, Text.of(TextManager.getText(

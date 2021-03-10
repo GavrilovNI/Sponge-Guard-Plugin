@@ -27,61 +27,34 @@ public class ConfigManager {
     private File configDir;
     private File regionsDir;
 
-    public ConfigManager(Path configDir)
-    {
+    private ConfigurationNode defaultRegionFlags;
+    private ConfigurationNode groups;
+
+
+    public ConfigManager(Path configDir) {
         this.configDir = configDir.toFile();
-        this.configDir.mkdirs();
-
         this.regionsDir = new File(this.configDir, "regions");
-        this.regionsDir.mkdirs();
     }
-
-    private Map<String, Boolean> flags;
-    //private ConfigurationNode serverProperties;
 
     public File getConfigDir() { return configDir; }
     public File getRegionsDir() { return regionsDir; }
-    public boolean getFlag(String flag)
-    {
-        return flags.getOrDefault(flag.toLowerCase(), true);
-    }
-    //public ConfigurationNode getServerProperty(String name) { return serverProperties.getNode("name"); }
+    public ConfigurationNode getDefaultRegionFlags() { return defaultRegionFlags; }
+    public ConfigurationNode getGroups() { return groups; }
 
     public void loadConfig() {
 
-        loadFlags();
+        this.configDir.mkdirs();
+        this.regionsDir.mkdirs();
+
+        this.defaultRegionFlags = FileUtils.getFileNode("defaultFlags.conf", configDir);
+        this.groups = FileUtils.getFileNode("groups.conf", configDir);
+
         TextManager.load();
-        //loadServerProperties();
 
         logger.info("Config loaded.");
     }
 
-    /*public void loadServerProperties()
-    {
-        String name = "server.properties";
-        logger.debug("Loading '"+name+"'.");
-        ConfigurationNode serverProperties = getFileNode(name, FileUtils.getServerDir());
 
-    }*/
-
-    public void loadFlags()
-    {
-        ConfigurationNode rootNode = FileUtils.getFileNode("flags.conf", configDir);
-
-        flags = new HashMap<>();
-
-        for (Map.Entry<Object, ? extends ConfigurationNode> entry : rootNode.getChildrenMap().entrySet())
-        {
-            String keyStr = entry.getKey().toString();
-            Boolean value = entry.getValue().getBoolean(true);
-            flags.put(keyStr.toLowerCase(), value);
-        }
-    }
-
-    public ConfigurationNode getDefaultRegionFlags()
-    {
-        return FileUtils.getFileNode("defaultFlags.conf", configDir);
-    }
 
 
 }

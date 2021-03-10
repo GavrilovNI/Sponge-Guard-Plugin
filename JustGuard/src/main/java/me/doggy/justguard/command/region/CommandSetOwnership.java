@@ -22,7 +22,7 @@ public class CommandSetOwnership implements CommandExecutor
     {
         Optional<String> regionNameOpt = args.getOne(CommandsRegistrator.REGION_ID);
         Optional<Player> playerToChangeOpt = args.getOne("player");
-        Optional<Region.PlayerState> stateOpt = args.getOne("state");
+        Optional<Region.PlayerOwnership> stateOpt = args.getOne("state");
 
         if(!regionNameOpt.isPresent()
                 || !playerToChangeOpt.isPresent()
@@ -34,13 +34,13 @@ public class CommandSetOwnership implements CommandExecutor
             MessageUtils.SendError(src, Text.of(TextManager.getText(Texts.ERR_NOT_REGION_OWNER)));
             return CommandResult.success();
         }
-        else if(src instanceof Player && !region.getPlayerState(((Player) src).getUniqueId()).equals(Region.PlayerState.Owner)) {
-            JustGuard.getInstance().getLogger().info(region.getPlayerState(((Player) src).getUniqueId()).name());
+        else if(src instanceof Player && !region.getPlayerOwnership(((Player) src).getUniqueId()).equals(Region.PlayerOwnership.Owner)) {
+            JustGuard.getInstance().getLogger().info(region.getPlayerOwnership(((Player) src).getUniqueId()).name());
             MessageUtils.SendError(src, Text.of(TextManager.getText(Texts.ERR_NOT_REGION_OWNER)));
             return CommandResult.success();
         }
 
-        region.setPlayerState(playerToChangeOpt.get().getUniqueId(), stateOpt.get());
+        region.setPlayerOwnership(playerToChangeOpt.get().getUniqueId(), stateOpt.get());
         MessageUtils.Send(src, Text.of(TextManager.getText(
                 Texts.CMD_ANSWER_SETOWNERSHIP,
                 regionNameOpt.get(),

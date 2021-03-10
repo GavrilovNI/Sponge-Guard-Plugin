@@ -79,7 +79,7 @@ public class CommandsRegistrator {
                 .permission(Permissions.COMMAND_REGION_SETOWNERSHIP)
                 .arguments(GenericArguments.string(Text.of(REGION_ID)),
                         GenericArguments.player(Text.of("player")),
-                        GenericArguments.enumValue(Text.of("state"), Region.PlayerState.class))
+                        GenericArguments.enumValue(Text.of("state"), Region.PlayerOwnership.class))
                 .executor(new CommandSetOwnership())
                 .build();
 

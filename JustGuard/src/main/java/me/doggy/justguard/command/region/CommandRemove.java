@@ -36,7 +36,7 @@ public class CommandRemove implements CommandExecutor
         {
             Player player = (Player) src;
             if(!player.hasPermission(Permissions.REGION_REMOVE_ANY) &&
-                !region.getPlayerState(player.getUniqueId()).equals(Region.PlayerState.Owner))
+                !region.getPlayerOwnership(player.getUniqueId()).equals(Region.PlayerOwnership.Owner))
             {
                 MessageUtils.SendError(src, Text.of(TextManager.getText(Texts.ERR_NOT_REGION_OWNER)));
                 return CommandResult.success();

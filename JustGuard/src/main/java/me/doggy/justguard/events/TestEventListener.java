@@ -28,7 +28,7 @@ import org.spongepowered.api.world.World;
 
 public class TestEventListener {
 
-    static Logger logger = JustGuard.getInstance().getLogger();
+    /*static Logger logger = JustGuard.getInstance().getLogger();
     static ConfigManager configManager = JustGuard.getInstance().getConfigManager();
 
     @Listener(order = Order.FIRST, beforeModifications = true)
@@ -117,7 +117,7 @@ public class TestEventListener {
         logger.info("");
         logger.info("");
         logger.info("");
-    }
+    }*/
 
 
 
