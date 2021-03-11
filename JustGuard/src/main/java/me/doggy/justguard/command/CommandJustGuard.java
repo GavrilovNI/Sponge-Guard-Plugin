@@ -4,6 +4,7 @@ import me.doggy.justguard.JustGuard;
 import me.doggy.justguard.config.ConfigManager;
 import me.doggy.justguard.utils.FileUtils;
 import me.doggy.justguard.utils.FlagUtils;
+import me.doggy.justguard.utils.help.Flag;
 import ninja.leaping.configurate.ConfigurationNode;
 import org.slf4j.Logger;
 import org.spongepowered.api.command.CommandResult;
@@ -11,9 +12,7 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Optional;
 
 public class CommandJustGuard implements CommandExecutor
 {
@@ -22,9 +21,16 @@ public class CommandJustGuard implements CommandExecutor
 
     public CommandResult execute(CommandSource src, CommandContext args) {
 
-        /*ConfigurationNode node = FileUtils.getFileNode("defaultFlags.conf", configManager.getConfigDir());
-        ConfigurationNode flagNode = FlagUtils.getFlag(node, "player", "stranger", "block-place", "minecraft:wool");
-        logger.info(flagNode.toString());*/
+        Optional<String> flagOpt = args.getOne("flag");
+
+        if(!flagOpt.isPresent())
+            return CommandResult.builder().successCount(0).build();
+
+        String[] flagPath = flagOpt.get().split("\\.");
+
+        ConfigurationNode node = FileUtils.getFileNode("defaultFlags.conf", configManager.getConfigDir());
+        Flag flag = FlagUtils.getFlag(node, flagPath);
+        logger.info(flag.toString());
 
         return CommandResult.success();
     }

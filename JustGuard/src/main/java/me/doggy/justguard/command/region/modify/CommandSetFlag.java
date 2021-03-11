@@ -8,6 +8,7 @@ import me.doggy.justguard.region.Region;
 import me.doggy.justguard.utils.CommandUtils;
 import me.doggy.justguard.utils.FlagUtils;
 import me.doggy.justguard.utils.MessageUtils;
+import me.doggy.justguard.utils.help.Flag;
 import ninja.leaping.configurate.ConfigurationNode;
 import org.slf4j.Logger;
 import org.spongepowered.api.command.CommandResult;
@@ -56,8 +57,7 @@ public class CommandSetFlag implements CommandExecutor
         node = FlagUtils.getAllInDefault(node);
 
         String oldValueStr = node.getString("null");
-        Object newValue = FlagUtils.parseStringToPossibleFlag(value);
-        node.setValue(newValue);
+        node.setValue(Flag.parse(value).getValue());
 
         MessageUtils.Send(src, Text.of(TextManager.getText(
                 Texts.CMD_ANSWER_FLAG_CHANGED,

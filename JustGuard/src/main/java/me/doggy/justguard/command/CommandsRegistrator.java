@@ -164,6 +164,7 @@ public class CommandsRegistrator {
         CommandSpec cmdJustGuard = CommandSpec.builder()
                 .description(Text.of("No command description"))
                 .permission(Permissions.COMMAND_BASE)
+                .arguments(GenericArguments.string(Text.of("flag")))
                 .executor(new CommandJustGuard())
                 .child(cmdVersion, "version")
                 .child(cmdReload, "reload")

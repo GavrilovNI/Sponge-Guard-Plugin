@@ -1,16 +1,12 @@
 package me.doggy.justguard.region;
 
-import me.doggy.justguard.JustGuard;
-import me.doggy.justguard.utils.FileUtils;
 import me.doggy.justguard.utils.FlagUtils;
 import me.doggy.justguard.utils.help.GsonableWorld;
 import me.doggy.justguard.utils.help.MyAABB;
+import me.doggy.justguard.utils.help.Flag;
 import ninja.leaping.configurate.ConfigurationNode;
-import org.apache.commons.lang3.ArrayUtils;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -97,10 +93,13 @@ public class Region<E extends World> {
     }
 
 
-    public ConfigurationNode getFlag(@NonNull Collection<String> path) {
+    @NonNull
+    public Flag getFlag(@NonNull Collection<String> path) {
         return FlagUtils.getFlag(flags, path);
     }
-    public ConfigurationNode getPlayerFlag(Player player, @NonNull Collection<String> path) {
+
+    @NonNull
+    public Flag getPlayerFlag(Player player, @NonNull Collection<String> path) {
         String playerStateKey = getPlayerOwnership(player.getUniqueId()).name().toLowerCase();
 
         ArrayList<String> pathList = new ArrayList(Arrays.asList("player", playerStateKey));
