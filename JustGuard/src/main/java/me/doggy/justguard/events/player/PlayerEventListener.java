@@ -13,8 +13,10 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.block.InteractBlockEvent;
+import org.spongepowered.api.event.cause.entity.damage.DamageType;
 import org.spongepowered.api.event.cause.entity.damage.DamageTypes;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
+import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
 import org.spongepowered.api.event.command.SendCommandEvent;
 import org.spongepowered.api.event.entity.CollideEntityEvent;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
@@ -240,6 +242,34 @@ public class PlayerEventListener {
         boolean hasPlayerPermission =
                 FlagUtils.hasPlayerPermission(player, player.getLocation(), Arrays.asList(Flags.NOT_TAKE_DAMAGE, damageTypeStr));
         if(hasPlayerPermission)
+        {
+            MessageUtils.SendError(player, Text.of(Texts.YOU_CANT_DO_THIS));
+            event.setCancelled(true);
+            return;
+        }
+    }
+
+    @Listener
+    public void onPlayerAttack(DamageEntityEvent event, @Root DamageSource source) {
+
+        Entity targetEntity = event.getTargetEntity();
+
+        if(!(source instanceof EntityDamageSource))
+            return;
+
+        EntityDamageSource entityDamageSource = (EntityDamageSource) source;
+
+        if(!(entityDamageSource.getSource() instanceof Player))
+            return;
+
+        Player player = (Player) entityDamageSource.getSource();
+        String targetEntityId = targetEntity.getType().getId();
+
+        logger.info("DamageEntityEvent(onPlayerAttack): "+targetEntityId);
+
+        boolean hasPlayerPermission =
+                FlagUtils.hasPlayerPermission(player, player.getLocation(), Arrays.asList(Flags.ATTACK, targetEntityId));
+        if(!hasPlayerPermission)
         {
             MessageUtils.SendError(player, Text.of(Texts.YOU_CANT_DO_THIS));
             event.setCancelled(true);
