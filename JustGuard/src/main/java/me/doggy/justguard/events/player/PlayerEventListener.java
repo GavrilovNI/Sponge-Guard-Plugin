@@ -7,12 +7,20 @@ import me.doggy.justguard.utils.FlagUtils;
 import me.doggy.justguard.utils.MessageUtils;
 import org.slf4j.Logger;
 import org.spongepowered.api.block.BlockSnapshot;
+import org.spongepowered.api.block.tileentity.TileEntity;
+import org.spongepowered.api.block.tileentity.TileEntityArchetype;
 import org.spongepowered.api.data.Transaction;
+import org.spongepowered.api.data.manipulator.immutable.tileentity.ImmutableSignData;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.block.InteractBlockEvent;
+import org.spongepowered.api.event.block.tileentity.TargetTileEntityEvent;
+import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.EventContext;
+import org.spongepowered.api.event.cause.EventContextKey;
+import org.spongepowered.api.event.cause.EventContextKeys;
 import org.spongepowered.api.event.cause.entity.damage.DamageType;
 import org.spongepowered.api.event.cause.entity.damage.DamageTypes;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
@@ -21,31 +29,63 @@ import org.spongepowered.api.event.command.SendCommandEvent;
 import org.spongepowered.api.event.entity.CollideEntityEvent;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
+import org.spongepowered.api.event.filter.IsCancelled;
 import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.event.filter.cause.Root;
+import org.spongepowered.api.event.item.inventory.InteractInventoryEvent;
 import org.spongepowered.api.event.item.inventory.InteractItemEvent;
+import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Function;
 
 public class PlayerEventListener {
 
     private static final JustGuard plugin = JustGuard.getInstance();
     private static final Logger logger = plugin.getLogger();
 
-    private boolean checkTransactions(Player player, List<Transaction<BlockSnapshot>> transactions, String ... flagPath)
-    {
-        ArrayList<String> flagPathList = new ArrayList<>(Arrays.asList(flagPath));
 
-        for(Transaction<BlockSnapshot> transaction : transactions)
+    private String getId(BlockSnapshot blockSnapshot) {
+        return blockSnapshot.getState().getType().getId();
+    }
+    private String getId(Entity entity) {
+        return entity.getType().getId();
+    }
+    private String getId(ItemStackSnapshot itemStackSnapshot) {
+        return itemStackSnapshot.getType().getId();
+    }
+    private boolean isTileEntity(BlockSnapshot blockSnapshot)
+    {
+        Optional<Location<World>> locationOpt = blockSnapshot.getLocation();
+        if(!locationOpt.isPresent()) {
+            return blockSnapshot.createArchetype().isPresent();
+        }
+
+        return locationOpt.get().getTileEntity().isPresent();
+    }
+
+    private <T extends BlockSnapshot> boolean checkTransactions(Player player, List<Transaction<T>> transactions, Function<Transaction, T> transactionToBlockSnapshot, String ... flagPath) {
+        List<String> prefixFlagPath = Arrays.asList(flagPath);
+
+        for(Transaction<T> transaction : transactions)
         {
-            String blockId = transaction.getOriginal().getState().getId();
-            flagPathList.add(blockId);
+            BlockSnapshot blockSnapshot = transactionToBlockSnapshot.apply(transaction);
+            String blockId = getId(blockSnapshot);
+
+            ArrayList<String> currFlagPath = new ArrayList<String>(prefixFlagPath);
+
+            boolean tileEntity = isTileEntity(blockSnapshot);
+
+            if(tileEntity)
+                currFlagPath.add(Flags.TILE_ENTITIES);
+
+            logger.info(blockId);
+            currFlagPath.add(blockId);
 
             Optional<Location<World>> locationOpt = transaction.getOriginal().getLocation();
 
@@ -55,86 +95,19 @@ public class PlayerEventListener {
             }
 
             boolean hasPlayerPermission =
-                    FlagUtils.hasPlayerPermission(player, locationOpt.get(), flagPathList);
+                    FlagUtils.hasPlayerPermission(player, locationOpt.get(), currFlagPath);
             if(!hasPlayerPermission) {
                 return false;
             }
-
-            flagPathList.remove(flagPathList.size()-1);
         }
         return true;
     }
 
     @Listener
-    public void onChangeBlockByPlayer_Break(ChangeBlockEvent.Break event, @First Player player)
-    {
-        logger.info("ChangeBlockEvent.Break");
-
-        List<Transaction<BlockSnapshot>> transactions = event.getTransactions();
-
-        if(!checkTransactions(player, transactions, Flags.BLOCK_BREAK))
-        {
-            MessageUtils.SendError(player, Text.of(Texts.YOU_CANT_DO_THIS));
-            event.setCancelled(true);
-        }
-    }
-    @Listener
-    public void onChangeBlockByPlayer_Place(ChangeBlockEvent.Place event, @First Player player)
-    {
-        logger.info("ChangeBlockEvent.Place");
-
-        List<Transaction<BlockSnapshot>> transactions = event.getTransactions();
-
-        if(!checkTransactions(player, transactions, Flags.BLOCK_PLACE))
-        {
-            MessageUtils.SendError(player, Text.of(Texts.YOU_CANT_DO_THIS));
-            event.setCancelled(true);
-        }
-    }
-
-    @Listener
-    public void onInteractEntityByPlayer_Primary(InteractEntityEvent.Primary event, @First Player player)
-    {
-        Entity targetEntity = event.getTargetEntity();
-        String entityId = targetEntity.getType().getId();
-
-        logger.info("InteractEntityEvent.Primary: "+entityId);
-
-        boolean hasPlayerPermission =
-                FlagUtils.hasPlayerPermission(player, targetEntity.getLocation(), Arrays.asList(Flags.ENTITY_INTERACT, Flags.PRIMARY, entityId));
-        if(!hasPlayerPermission)
-        {
-            MessageUtils.SendError(player, Text.of(Texts.YOU_CANT_DO_THIS));
-            event.setCancelled(true);
-            return;
-        }
-    }
-
-    @Listener
-    public void onInteractEntityByPlayer_Secondary(InteractEntityEvent.Secondary event, @First Player player)
-    {
-
-        Entity targetEntity = event.getTargetEntity();
-        String entityId = targetEntity.getType().getId();
-
-        logger.info("InteractEntityEvent.Secondary: "+entityId);
-
-        boolean hasPlayerPermission =
-                FlagUtils.hasPlayerPermission(player, targetEntity.getLocation(), Arrays.asList(Flags.ENTITY_INTERACT, Flags.SECONDARY, entityId));
-        if(!hasPlayerPermission)
-        {
-            MessageUtils.SendError(player, Text.of(Texts.YOU_CANT_DO_THIS));
-            event.setCancelled(true);
-            return;
-        }
-    }
-
-
-    @Listener
     public void onInteractBlockByPlayer_Primary(InteractBlockEvent.Primary event, @First Player player) {
 
         BlockSnapshot block = event.getTargetBlock();
-        String blockId = block.getState().getType().getId();
+        String blockId = getId(block);
         Optional<Location<World>> locationOpt = block.getLocation();
 
         logger.info("InteractBlockEvent.Primary: "+blockId);
@@ -144,22 +117,26 @@ public class PlayerEventListener {
             return;
         }
 
+        ArrayList<String> flagPath = new ArrayList<String>(Arrays.asList(Flags.BLOCK_INTERACT, Flags.PRIMARY, blockId));
+        if(isTileEntity(block))
+            flagPath.add(flagPath.size() - 1,Flags.TILE_ENTITIES);
+
         boolean hasPlayerPermission =
-                FlagUtils.hasPlayerPermission(player, locationOpt.get(), Arrays.asList(Flags.BLOCK_INTERACT, Flags.PRIMARY, blockId));
+                FlagUtils.hasPlayerPermission(player, locationOpt.get(), flagPath);
         if(!hasPlayerPermission)
         {
             MessageUtils.SendError(player, Text.of(Texts.YOU_CANT_DO_THIS));
+            logger.info("canceled");
             event.setCancelled(true);
             return;
         }
 
     }
-
     @Listener
     public void onInteractBlockByPlayer_Secondary(InteractBlockEvent.Secondary event, @First Player player) {
 
         BlockSnapshot block = event.getTargetBlock();
-        String blockId = block.getState().getType().getId();
+        String blockId = getId(block);
         Optional<Location<World>> locationOpt = block.getLocation();
 
         logger.info("InteractBlockEvent.Secondary: "+blockId);
@@ -168,12 +145,18 @@ public class PlayerEventListener {
             logger.info("location not found");
             return;
         }
+        Location<World> location = locationOpt.get();
+
+        ArrayList<String> flagPath = new ArrayList<String>(Arrays.asList(Flags.BLOCK_INTERACT, Flags.SECONDARY, blockId));
+        if(isTileEntity(block))
+            flagPath.add(flagPath.size() - 1,Flags.TILE_ENTITIES);
 
         boolean hasPlayerPermission =
-                FlagUtils.hasPlayerPermission(player, locationOpt.get(), Arrays.asList(Flags.BLOCK_INTERACT, Flags.SECONDARY, blockId));
+                FlagUtils.hasPlayerPermission(player, location, flagPath);
         if(!hasPlayerPermission)
         {
             MessageUtils.SendError(player, Text.of(Texts.YOU_CANT_DO_THIS));
+            logger.info("canceled");
             event.setCancelled(true);
             return;
         }
@@ -181,8 +164,99 @@ public class PlayerEventListener {
     }
 
     @Listener
+    public void onInteractInventoryByPlayer_Open(InteractInventoryEvent.Open event, @First Player player) {
+        logger.info("InteractInventoryEvent.Open");
+
+        EventContext context = event.getContext();
+
+        Optional<BlockSnapshot> blockHitOpt = context.get(EventContextKeys.BLOCK_HIT);
+        if(!blockHitOpt.isPresent())
+            return;
+
+        BlockSnapshot blockSnapshot = blockHitOpt.get();
+        Optional<Location<World>> locationOpt = blockSnapshot.getLocation();
+
+        if(!locationOpt.isPresent())
+            return;
+
+        String blockId = getId(blockSnapshot);
+
+        boolean hasPlayerPermission =
+                FlagUtils.hasPlayerPermission(player, locationOpt.get(), Arrays.asList(Flags.INVENTORY_INTERACT, Flags.OPEN, blockId));
+        if(!hasPlayerPermission)
+        {
+            MessageUtils.SendError(player, Text.of(Texts.YOU_CANT_DO_THIS));
+            logger.info("canceled");
+            event.setCancelled(true);
+            return;
+        }
+    }
+
+    @Listener
+    public void onChangeBlockByPlayer_Break(ChangeBlockEvent.Break event, @First Player player) {
+        logger.info("ChangeBlockEvent.Break");
+
+        List<Transaction<BlockSnapshot>> transactions = event.getTransactions();
+
+
+        if(!checkTransactions(player, transactions, t->(BlockSnapshot) t.getOriginal(), Flags.BLOCK_BREAK)) {
+            MessageUtils.SendError(player, Text.of(Texts.YOU_CANT_DO_THIS));
+            logger.info("canceled");
+            event.setCancelled(true);
+        }
+    }
+    @Listener
+    public void onChangeBlockByPlayer_Place(ChangeBlockEvent.Place event, @First Player player) {
+        logger.info("ChangeBlockEvent.Place");
+
+        List<Transaction<BlockSnapshot>> transactions = event.getTransactions();
+
+        if(!checkTransactions(player, transactions, t->(BlockSnapshot) t.getFinal(), Flags.BLOCK_PLACE)) {
+            MessageUtils.SendError(player, Text.of(Texts.YOU_CANT_DO_THIS));
+            logger.info("canceled");
+            event.setCancelled(true);
+        }
+    }
+
+    @Listener
+    public void onInteractEntityByPlayer_Primary(InteractEntityEvent.Primary event, @First Player player) {
+        Entity targetEntity = event.getTargetEntity();
+        String entityId = getId(targetEntity);
+
+        logger.info("InteractEntityEvent.Primary: "+entityId);
+
+        boolean hasPlayerPermission =
+                FlagUtils.hasPlayerPermission(player, targetEntity.getLocation(), Arrays.asList(Flags.ENTITY_INTERACT, Flags.PRIMARY, entityId));
+        if(!hasPlayerPermission)
+        {
+            MessageUtils.SendError(player, Text.of(Texts.YOU_CANT_DO_THIS));
+            logger.info("canceled");
+            event.setCancelled(true);
+            return;
+        }
+    }
+    @Listener
+    public void onInteractEntityByPlayer_Secondary(InteractEntityEvent.Secondary event, @First Player player) {
+
+        Entity targetEntity = event.getTargetEntity();
+        String entityId = getId(targetEntity);
+
+        logger.info("InteractEntityEvent.Secondary: "+entityId);
+
+        boolean hasPlayerPermission =
+                FlagUtils.hasPlayerPermission(player, targetEntity.getLocation(), Arrays.asList(Flags.ENTITY_INTERACT, Flags.SECONDARY, entityId));
+        if(!hasPlayerPermission)
+        {
+            MessageUtils.SendError(player, Text.of(Texts.YOU_CANT_DO_THIS));
+            logger.info("canceled");
+            event.setCancelled(true);
+            return;
+        }
+    }
+
+    @Listener
     public void onInteractItemByPlayer_Primary(InteractItemEvent.Primary event, @First Player player) {
-        String itemId = event.getItemStack().getType().getId();
+        String itemId = getId(event.getItemStack());
 
         logger.info("InteractItemEvent.Primary: "+itemId);
 
@@ -191,14 +265,14 @@ public class PlayerEventListener {
         if(!hasPlayerPermission)
         {
             MessageUtils.SendError(player, Text.of(Texts.YOU_CANT_DO_THIS));
+            logger.info("canceled");
             event.setCancelled(true);
             return;
         }
     }
-
     @Listener
     public void onInteractItemByPlayer_Secondary(InteractItemEvent.Secondary event, @First Player player) {
-        String itemId = event.getItemStack().getType().getId();
+        String itemId = getId(event.getItemStack());
 
         logger.info("InteractItemEvent.Secondary: "+itemId);
 
@@ -207,21 +281,25 @@ public class PlayerEventListener {
         if(!hasPlayerPermission)
         {
             MessageUtils.SendError(player, Text.of(Texts.YOU_CANT_DO_THIS));
+            logger.info("canceled");
             event.setCancelled(true);
             return;
         }
     }
 
     @Listener
-    public void onCommand(SendCommandEvent event, @First Player player) {
+    public void onPlayerSendCommand(SendCommandEvent event, @First Player player) {
+
+        String command = event.getCommand();
 
         logger.info("SendCommandEvent");
 
         boolean hasPlayerPermission =
-                FlagUtils.hasPlayerPermission(player, player.getLocation(), Arrays.asList(Flags.SEND_COMMAND));
+                FlagUtils.hasPlayerPermission(player, player.getLocation(), Arrays.asList(Flags.SEND_COMMAND, command));
         if(!hasPlayerPermission)
         {
             MessageUtils.SendError(player, Text.of(Texts.YOU_CANT_DO_THIS));
+            logger.info("canceled");
             event.setCancelled(true);
             return;
         }
@@ -244,6 +322,7 @@ public class PlayerEventListener {
         if(hasPlayerPermission)
         {
             MessageUtils.SendError(player, Text.of(Texts.YOU_CANT_DO_THIS));
+            logger.info("canceled");
             event.setCancelled(true);
             return;
         }
@@ -263,7 +342,7 @@ public class PlayerEventListener {
             return;
 
         Player player = (Player) entityDamageSource.getSource();
-        String targetEntityId = targetEntity.getType().getId();
+        String targetEntityId = getId(targetEntity);
 
         logger.info("DamageEntityEvent(onPlayerAttack): "+targetEntityId);
 
@@ -272,14 +351,11 @@ public class PlayerEventListener {
         if(!hasPlayerPermission)
         {
             MessageUtils.SendError(player, Text.of(Texts.YOU_CANT_DO_THIS));
+            logger.info("canceled");
             event.setCancelled(true);
             return;
         }
     }
-
-
-
-
 
 
 
@@ -295,7 +371,7 @@ public class PlayerEventListener {
 
         for(Entity entity : entities)
         {
-            String entityId = entity.getType().getId();
+            String entityId = getId(entity);
 
             logger.info(entityId);
 
@@ -303,6 +379,7 @@ public class PlayerEventListener {
                     FlagUtils.hasPlayerPermission(player, entity.getLocation(), Arrays.asList(Flags.ENTITY_COLLIDE, Flags.IMPACT, entityId));
             if(!hasPlayerPermission) {
                 MessageUtils.SendError(player, Text.of(Texts.YOU_CANT_DO_THIS));
+                logger.info("canceled");
                 event.setCancelled(true);
                 return;
             }
