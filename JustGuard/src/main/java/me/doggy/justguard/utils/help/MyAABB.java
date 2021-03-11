@@ -69,4 +69,11 @@ public class MyAABB extends AABB {
                 && this.getMax().getY() > other.getMin().getY() && other.getMax().getY() > this.getMin().getY()
                 && this.getMax().getZ() > other.getMin().getZ() && other.getMax().getZ() > this.getMin().getZ();
     }
+
+    @Override
+    public boolean contains(double x, double y, double z) {
+        return this.getMin().getX() <= x && this.getMax().getX() > x
+                && this.getMin().getY() <= y && this.getMax().getY() > y
+                && this.getMin().getZ() <= z && this.getMax().getZ() > z;
+    }
 }
