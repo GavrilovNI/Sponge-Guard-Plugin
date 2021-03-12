@@ -164,14 +164,14 @@ public class CommandsRegistrator {
         CommandSpec cmdJustGuard = CommandSpec.builder()
                 .description(Text.of("No command description"))
                 .permission(Permissions.COMMAND_BASE)
-                .arguments(GenericArguments.string(Text.of("flag")))
-                .executor(new CommandJustGuard())
                 .child(cmdVersion, "version")
                 .child(cmdReload, "reload")
                 .child(cmdSave, "save")
                 .child(cmdLoad, "load")
                 .child(cmdRegion, "region", "rg")
                 .child(cmdWand, "wand")
+                //.arguments(GenericArguments.string(Text.of("flag")))
+                .executor(new CommandJustGuard())
                 .build();
 
         JustGuard plugin = JustGuard.getInstance();

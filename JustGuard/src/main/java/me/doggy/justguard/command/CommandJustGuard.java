@@ -2,9 +2,10 @@ package me.doggy.justguard.command;
 
 import me.doggy.justguard.JustGuard;
 import me.doggy.justguard.config.ConfigManager;
+import me.doggy.justguard.flag.FlagPath;
 import me.doggy.justguard.utils.FileUtils;
 import me.doggy.justguard.utils.FlagUtils;
-import me.doggy.justguard.utils.help.Flag;
+import me.doggy.justguard.flag.FlagValue;
 import ninja.leaping.configurate.ConfigurationNode;
 import org.slf4j.Logger;
 import org.spongepowered.api.command.CommandResult;
@@ -26,10 +27,8 @@ public class CommandJustGuard implements CommandExecutor
         if(!flagOpt.isPresent())
             return CommandResult.builder().successCount(0).build();
 
-        String[] flagPath = flagOpt.get().split("\\.");
-
         ConfigurationNode node = FileUtils.getFileNode("defaultFlags.conf", configManager.getConfigDir());
-        Flag flag = FlagUtils.getFlag(node, flagPath);
+        FlagValue flag = FlagUtils.getFlag(node, FlagPath.parse(flagOpt.get()));
         logger.info(flag.toString());
 
         return CommandResult.success();

@@ -47,6 +47,6 @@ public class Texts
     public static final String MIN_POSITION = "min-position";
     public static final String MAX_POSITION = "max-position";
 
-    public static final String YOU_CANT_DO_THIS = "you-cant-do-this";
+    public static final String DONT_HAVE_FLAG_ACCESS = "dont-have-flag-access";
 
 }

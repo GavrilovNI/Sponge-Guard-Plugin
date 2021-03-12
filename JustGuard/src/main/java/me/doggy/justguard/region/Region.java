@@ -1,9 +1,11 @@
 package me.doggy.justguard.region;
 
+import me.doggy.justguard.consts.Flags;
+import me.doggy.justguard.flag.FlagPath;
 import me.doggy.justguard.utils.FlagUtils;
 import me.doggy.justguard.utils.help.GsonableWorld;
 import me.doggy.justguard.utils.help.MyAABB;
-import me.doggy.justguard.utils.help.Flag;
+import me.doggy.justguard.flag.FlagValue;
 import ninja.leaping.configurate.ConfigurationNode;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.api.entity.living.player.Player;
@@ -94,17 +96,14 @@ public class Region<E extends World> {
 
 
     @NonNull
-    public Flag getFlag(@NonNull Collection<String> path) {
+    public FlagValue getFlag(FlagPath path) {
         return FlagUtils.getFlag(flags, path);
     }
 
     @NonNull
-    public Flag getPlayerFlag(Player player, @NonNull Collection<String> path) {
+    public FlagValue getPlayerFlag(Player player, FlagPath path) {
         String playerStateKey = getPlayerOwnership(player.getUniqueId()).name().toLowerCase();
-
-        ArrayList<String> pathList = new ArrayList(Arrays.asList("player", playerStateKey));
-        pathList.addAll(path);
-        return getFlag(pathList);
+        return getFlag(new FlagPath(Flags.PLAYER, playerStateKey).add(path));
     }
 
 

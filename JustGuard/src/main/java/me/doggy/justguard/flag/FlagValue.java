@@ -1,20 +1,18 @@
-package me.doggy.justguard.utils.help;
+package me.doggy.justguard.flag;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public class Flag {
-
-    public static final Flag INSTANCE_EMPTY = new Flag(null);
+public class FlagValue {
 
     private Object value;
 
-    public Flag(@Nullable Object value) {
+    public FlagValue(@Nullable Object value) {
         setValue(value);
     }
 
-    public static Flag parse(@Nullable String str) {
+    public static FlagValue parse(@Nullable String str) {
         if(str == null)
-            return INSTANCE_EMPTY;
+            return new FlagValue(null);
 
         String lower = str.toLowerCase();
 
@@ -26,7 +24,7 @@ public class Flag {
         else
             value = str;
 
-        return new Flag(value);
+        return new FlagValue(value);
     }
 
     public Boolean setValue(@Nullable Object value)

@@ -1,14 +1,17 @@
 package me.doggy.justguard.utils;
 
-import com.google.common.collect.Iterables;
 import me.doggy.justguard.JustGuard;
 import me.doggy.justguard.config.ConfigManager;
+import me.doggy.justguard.config.TextManager;
+import me.doggy.justguard.consts.Texts;
+import me.doggy.justguard.flag.FlagPath;
 import me.doggy.justguard.utils.help.RegionPair;
-import me.doggy.justguard.utils.help.Flag;
+import me.doggy.justguard.flag.FlagValue;
 import ninja.leaping.configurate.ConfigurationNode;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -23,20 +26,20 @@ public class FlagUtils {
     public static final String KEY_INHERITS = "inherits";
     public static final String KEY_VALUES = "values";
 
-    public static boolean hasPlayerPermission(Player player, List<RegionPair> regions, @NonNull Collection<String> path)
+    public static boolean hasPlayerFlagAccess(Player player, List<RegionPair> regions, FlagPath path)
     {
         for (RegionPair regionPair : regions)
         {
-            if(!regionPair.region.getPlayerFlag(player, path).getBoolean(false))
+            if(!regionPair.region.getPlayerFlag(player, path).getBoolean(false)) {
                 return false;
+            }
         }
         return true;
     }
-    public static boolean hasPlayerPermission(Player player, Location<World> location, @NonNull Collection<String> path)
+    public static boolean hasPlayerFlagAccess(Player player, Location<World> location, FlagPath path)
     {
         List<RegionPair> regions = RegionUtils.getHighestPriorityRegions(RegionUtils.getRegionsInLocation(location));
-
-        return hasPlayerPermission(player, regions, path);
+        return hasPlayerFlagAccess(player, regions, path);
     }
 
     private static HashSet<ConfigurationNode> getAllNodesThisInheritsFrom(ConfigurationNode node, HashSet<ConfigurationNode> alreadyChecked) {
@@ -107,24 +110,25 @@ public class FlagUtils {
 
     // return null if not found
     @NonNull
-    private static Flag getFlag(ConfigurationNode root, @NonNull Iterable<String> path, @NonNull HashSet<ConfigurationNode> checkedFlags) {
+    private static FlagValue getFlag(ConfigurationNode root, FlagPath path, @NonNull HashSet<ConfigurationNode> checkedFlags) {
 
         if(!checkedFlags.add(root))
-            return Flag.INSTANCE_EMPTY;
+            return new FlagValue(null);
 
         if(!root.isMap())
-            return new Flag(root.getValue());
+            return new FlagValue(root.getValue());
 
-        String key = Iterables.getFirst(path, null);
-        Iterable<String> innerPath = Iterables.skip(path, 1);
 
+        String key = path.getFirst();
         ConfigurationNode innerNode = root.getNode(key);
 
         if(!innerNode.isVirtual()) {
-            if(Iterables.size(path) == 1) {
-                return getFlag(innerNode, Arrays.asList(KEY_DEFAULT), new HashSet<ConfigurationNode>());
+            if(path.length() == 1) {
+                return getFlag(innerNode, new FlagPath(KEY_DEFAULT), new HashSet<ConfigurationNode>());
             }
-            Flag value = getFlag(innerNode, innerPath, new HashSet<ConfigurationNode>()); // going inside
+
+            FlagPath innerPath = path.cut(1);
+            FlagValue value = getFlag(innerNode, innerPath, new HashSet<ConfigurationNode>()); // going inside
             if(!value.isEmpty())
                 return value;
         }
@@ -138,32 +142,28 @@ public class FlagUtils {
             if (groupValueNode.isVirtual() || !containsInGroup(entry.getValue(), key))
                 continue;
 
-            return new Flag(groupValueNode.getValue());
+            return new FlagValue(groupValueNode.getValue());
         }
 
         //looking for default
         ConfigurationNode defaultNode = getAllInDefault(root.getNode(KEY_DEFAULT));
         if(!defaultNode.isVirtual())
-            return new Flag(defaultNode.getValue());
+            return new FlagValue(defaultNode.getValue());
 
         //looking in flags this inherits from
         HashSet<ConfigurationNode> inheritsFromNodes = getAllNodesThisInheritsFrom(root, checkedFlags);
 
         for(ConfigurationNode inheritsFromNode : inheritsFromNodes)
         {
-            Flag foundValue = getFlag(inheritsFromNode, path, checkedFlags);
+            FlagValue foundValue = getFlag(inheritsFromNode, path, checkedFlags);
             if(!foundValue.isEmpty())
                 return foundValue;
         }
 
-        return Flag.INSTANCE_EMPTY;
+        return new FlagValue(null);
     }
     @NonNull
-    public static Flag getFlag(ConfigurationNode root, @NonNull Iterable<String> path) {
+    public static FlagValue getFlag(ConfigurationNode root, FlagPath path) {
         return getFlag(root, path, new HashSet<ConfigurationNode>());
-    }
-    @NonNull
-    public static Flag getFlag(ConfigurationNode root, String ... path) {
-        return getFlag(root, Arrays.asList(path));
     }
 }
