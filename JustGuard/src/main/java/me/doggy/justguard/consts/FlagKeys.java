@@ -1,6 +1,6 @@
 package me.doggy.justguard.consts;
 
-public class Flags {
+public class FlagKeys {
 
     public static final String PLAYER = "player";
     public static final String PRIMARY = "primary";

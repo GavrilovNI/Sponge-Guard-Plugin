@@ -1,6 +1,7 @@
 package me.doggy.justguard;
 
 import com.flowpowered.math.vector.Vector3d;
+import me.doggy.justguard.flag.Flags;
 import me.doggy.justguard.region.Region;
 import me.doggy.justguard.utils.help.PendingRegion;
 import ninja.leaping.configurate.ConfigurationNode;
@@ -28,10 +29,10 @@ public class Pending {
         return regions.get(source);
     }
 
-    public static PendingRegion createRegion(CommandSource source, RegionType regionType, ConfigurationNode flags, World world)
+    public static PendingRegion createRegion(CommandSource source, RegionType regionType, ConfigurationNode flagsNode, World world)
     {
         PendingRegion pendingRegion = new PendingRegion();
-        pendingRegion.flags = flags;
+        pendingRegion.flags = new Flags(flagsNode);
         pendingRegion.world = world;
 
         if(regionType.equals(RegionType.Global))

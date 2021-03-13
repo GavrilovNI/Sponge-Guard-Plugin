@@ -3,6 +3,7 @@ package me.doggy.justguard.command;
 import me.doggy.justguard.JustGuard;
 import me.doggy.justguard.config.ConfigManager;
 import me.doggy.justguard.flag.FlagPath;
+import me.doggy.justguard.flag.Flags;
 import me.doggy.justguard.utils.FileUtils;
 import me.doggy.justguard.utils.FlagUtils;
 import me.doggy.justguard.flag.FlagValue;
@@ -27,8 +28,8 @@ public class CommandJustGuard implements CommandExecutor
         if(!flagOpt.isPresent())
             return CommandResult.builder().successCount(0).build();
 
-        ConfigurationNode node = FileUtils.getFileNode("defaultFlags.conf", configManager.getConfigDir());
-        FlagValue flag = FlagUtils.getFlag(node, FlagPath.parse(flagOpt.get()));
+        Flags flags = new Flags(configManager.getDefaultRegionFlags());
+        FlagValue flag = flags.getFlag(FlagPath.parse(flagOpt.get()));
         logger.info(flag.toString());
 
         return CommandResult.success();

@@ -6,6 +6,7 @@ import com.google.gson.GsonBuilder;
 import me.doggy.justguard.JustGuard;
 import me.doggy.justguard.config.ConfigManager;
 import me.doggy.justguard.consts.Permissions;
+import me.doggy.justguard.flag.Flags;
 import me.doggy.justguard.region.Region;
 import me.doggy.justguard.utils.help.MyAABB;
 import me.doggy.justguard.utils.help.RegionPair;
@@ -16,7 +17,6 @@ import ninja.leaping.configurate.loader.ConfigurationLoader;
 import org.slf4j.Logger;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -60,7 +60,7 @@ public class RegionUtils {
             ConfigurationLoader<CommentedConfigurationNode> loader =
                     HoconConfigurationLoader.builder().setPath(flagsFile.toPath()).build();
 
-            loader.save(regionPair.region.getFlags());
+            regionPair.region.getFlags().save(loader);
 
         } catch (IOException e) {
             saved = false;
@@ -99,7 +99,7 @@ public class RegionUtils {
                     HoconConfigurationLoader.builder().setPath(flagsFile.toPath()).build();
 
             ConfigurationNode flags = loader.load();
-            result.region.setFlags(flags);
+            result.region.setFlags(new Flags(flags));
 
         } catch (IOException e) {
             logger.error("Error when loading region '"+directory.toString()+"'. Exception: "+ e);

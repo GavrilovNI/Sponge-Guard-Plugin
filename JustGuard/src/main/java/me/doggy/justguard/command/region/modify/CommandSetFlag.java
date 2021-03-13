@@ -4,6 +4,7 @@ import me.doggy.justguard.JustGuard;
 import me.doggy.justguard.command.CommandsRegistrator;
 import me.doggy.justguard.config.TextManager;
 import me.doggy.justguard.consts.Texts;
+import me.doggy.justguard.flag.FlagPath;
 import me.doggy.justguard.region.Region;
 import me.doggy.justguard.utils.CommandUtils;
 import me.doggy.justguard.utils.FlagUtils;
@@ -35,36 +36,27 @@ public class CommandSetFlag implements CommandExecutor
 
         String regionId = regionIdOpt.get();
         String flag = flagOpt.get();
-        String value = valueOpt.get();
+        FlagValue newValue = FlagValue.parse(valueOpt.get());
 
         Region region = JustGuard.REGIONS.get(regionId);
 
         if(!CommandUtils.canContinueModifyRegion(region, src, true))
             return CommandResult.success();
 
-        String[] flagPath = flag.split("\\.");
-
-        if(flagPath.length == 0) {
+        FlagPath flagPath = FlagPath.parse(flag);
+        if(flagPath.isEmpty()) {
             MessageUtils.SendError(src, Text.of(TextManager.getText(Texts.ERR_CMD_NOT_ENOUGH_ARGUMENTS)));
             return CommandResult.success();
         }
 
-        ConfigurationNode node = region.getFlags();
-        for(String currPath : flagPath) {
-            FlagUtils.makeNodeUseDefault(node);
-            node = node.getNode(currPath);
-        }
-        node = FlagUtils.getAllInDefault(node);
-
-        String oldValueStr = node.getString("null");
-        node.setValue(FlagValue.parse(value).getValue());
+        FlagValue oldValue = region.setFlag(flagPath, newValue);
 
         MessageUtils.Send(src, Text.of(TextManager.getText(
                 Texts.CMD_ANSWER_FLAG_CHANGED,
                 regionId,
-                flag,
-                oldValueStr,
-                value
+                flagPath.getFullPath(),
+                oldValue.getValueToString(),
+                newValue.getValueToString()
         )));
 
 

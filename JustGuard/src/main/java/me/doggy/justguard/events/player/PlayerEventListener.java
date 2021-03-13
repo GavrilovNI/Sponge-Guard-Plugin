@@ -2,7 +2,7 @@ package me.doggy.justguard.events.player;
 
 import me.doggy.justguard.JustGuard;
 import me.doggy.justguard.config.TextManager;
-import me.doggy.justguard.consts.Flags;
+import me.doggy.justguard.consts.FlagKeys;
 import me.doggy.justguard.consts.Texts;
 import me.doggy.justguard.flag.FlagPath;
 import me.doggy.justguard.utils.FlagUtils;
@@ -57,7 +57,7 @@ public class PlayerEventListener {
         FlagPath result = new FlagPath(lastId);
 
         if(isTileEntity(blockSnapshot))
-            result.addInFront(Flags.TILE_ENTITIES);
+            result.addInFront(FlagKeys.TILE_ENTITIES);
 
         return result;
     }
@@ -120,13 +120,13 @@ public class PlayerEventListener {
     @Listener
     public void onInteractBlockByPlayer_Primary(InteractBlockEvent.Primary event, @First Player player) {
         BlockSnapshot blockSnapshot = event.getTargetBlock();
-        FlagPath flagPath = new FlagPath(Flags.BLOCK_INTERACT, Flags.PRIMARY).add(getId(blockSnapshot));
+        FlagPath flagPath = new FlagPath(FlagKeys.BLOCK_INTERACT, FlagKeys.PRIMARY).add(getId(blockSnapshot));
         checkAndCancelIfNeeded(event, player, blockSnapshot.getLocation(), flagPath);
     }
     @Listener
     public void onInteractBlockByPlayer_Secondary(InteractBlockEvent.Secondary event, @First Player player) {
         BlockSnapshot blockSnapshot = event.getTargetBlock();
-        FlagPath flagPath = new FlagPath(Flags.BLOCK_INTERACT, Flags.SECONDARY).add(getId(blockSnapshot));
+        FlagPath flagPath = new FlagPath(FlagKeys.BLOCK_INTERACT, FlagKeys.SECONDARY).add(getId(blockSnapshot));
         checkAndCancelIfNeeded(event, player, blockSnapshot.getLocation(), flagPath);
     }
 
@@ -138,23 +138,23 @@ public class PlayerEventListener {
             return;
 
         BlockSnapshot blockSnapshot = blockHitOpt.get();
-        FlagPath flagPath = new FlagPath(Flags.INVENTORY_INTERACT, Flags.OPEN).add(getId(blockSnapshot));
+        FlagPath flagPath = new FlagPath(FlagKeys.INVENTORY_INTERACT, FlagKeys.OPEN).add(getId(blockSnapshot));
         checkAndCancelIfNeeded(event, player, blockSnapshot.getLocation(), flagPath);
     }
 
     @Listener
     public void onChangeBlockByPlayer_Break(ChangeBlockEvent.Break event, @First Player player) {
-        checkAndCancelIfNeeded(event, player, t->(BlockSnapshot) t.getFinal(), new FlagPath(Flags.BLOCK_BREAK));
+        checkAndCancelIfNeeded(event, player, t->(BlockSnapshot) t.getFinal(), new FlagPath(FlagKeys.BLOCK_BREAK));
     }
     @Listener
     public void onChangeBlockByPlayer_Place(ChangeBlockEvent.Place event, @First Player player) {
-        checkAndCancelIfNeeded(event, player, t->(BlockSnapshot) t.getFinal(), new FlagPath(Flags.BLOCK_PLACE));
+        checkAndCancelIfNeeded(event, player, t->(BlockSnapshot) t.getFinal(), new FlagPath(FlagKeys.BLOCK_PLACE));
     }
 
     @Listener
     public void onInteractEntityByPlayer_Primary(InteractEntityEvent.Primary event, @First Player player) {
         Entity targetEntity = event.getTargetEntity();
-        FlagPath flagPath = new FlagPath(Flags.ENTITY_INTERACT, Flags.PRIMARY).add(getId(targetEntity));
+        FlagPath flagPath = new FlagPath(FlagKeys.ENTITY_INTERACT, FlagKeys.PRIMARY).add(getId(targetEntity));
         checkAndCancelIfNeeded(event, player, targetEntity.getLocation(), flagPath);
 
         logger.info("tileentity: " + String.valueOf(targetEntity instanceof TileEntity));
@@ -162,7 +162,7 @@ public class PlayerEventListener {
     @Listener
     public void onInteractEntityByPlayer_Secondary(InteractEntityEvent.Secondary event, @First Player player) {
         Entity targetEntity = event.getTargetEntity();
-        FlagPath flagPath = new FlagPath(Flags.ENTITY_INTERACT, Flags.SECONDARY).add(getId(targetEntity));
+        FlagPath flagPath = new FlagPath(FlagKeys.ENTITY_INTERACT, FlagKeys.SECONDARY).add(getId(targetEntity));
         checkAndCancelIfNeeded(event, player, targetEntity.getLocation(), flagPath);
 
         logger.info("tileentity: " + String.valueOf(targetEntity instanceof TileEntity));
@@ -175,7 +175,7 @@ public class PlayerEventListener {
 
         List<Entity> entities = event.getEntities();
         for (Entity targetEntity : entities) {
-            FlagPath flagPath = new FlagPath(Flags.ENTITY_SPAWN).add(getId(spawnTypeOpt.get())).add(getId(targetEntity));
+            FlagPath flagPath = new FlagPath(FlagKeys.ENTITY_SPAWN).add(getId(spawnTypeOpt.get())).add(getId(targetEntity));
             if(!checkAndCancelIfNeeded(event, player, targetEntity.getLocation(), flagPath))
                 return;
         }
@@ -195,10 +195,10 @@ public class PlayerEventListener {
         Player playerSource = (Player) entityDamageSource.getSource();
 
         if(targetEntity instanceof Living) {
-            FlagPath flagPath = new FlagPath(Flags.ATTACK).add(getId(targetEntity));
+            FlagPath flagPath = new FlagPath(FlagKeys.ATTACK).add(getId(targetEntity));
             checkAndCancelIfNeeded(event, playerSource, playerSource.getLocation(), flagPath);
         } else {
-            FlagPath flagPath = new FlagPath(Flags.ENTITY_ATTACK).add(getId(targetEntity));
+            FlagPath flagPath = new FlagPath(FlagKeys.ENTITY_ATTACK).add(getId(targetEntity));
             checkAndCancelIfNeeded(event, playerSource, targetEntity.getLocation(), flagPath);
         }
     }
@@ -221,13 +221,13 @@ public class PlayerEventListener {
     @Listener
     public void onInteractItemByPlayer_Primary(InteractItemEvent.Primary event, @First Player player) {
         ItemStackSnapshot itemStackSnapshot = event.getItemStack();
-        FlagPath flagPath = new FlagPath(Flags.ITEM_INTERACT, Flags.PRIMARY).add(getId(itemStackSnapshot));
+        FlagPath flagPath = new FlagPath(FlagKeys.ITEM_INTERACT, FlagKeys.PRIMARY).add(getId(itemStackSnapshot));
         checkAndCancelIfNeeded(event, player, player.getLocation(), flagPath);
     }
     @Listener
     public void onInteractItemByPlayer_Secondary(InteractItemEvent.Secondary event, @First Player player) {
         ItemStackSnapshot itemStackSnapshot = event.getItemStack();
-        FlagPath flagPath = new FlagPath(Flags.ITEM_INTERACT, Flags.SECONDARY).add(getId(itemStackSnapshot));
+        FlagPath flagPath = new FlagPath(FlagKeys.ITEM_INTERACT, FlagKeys.SECONDARY).add(getId(itemStackSnapshot));
         checkAndCancelIfNeeded(event, player, player.getLocation(), flagPath);
     }
 
@@ -236,7 +236,7 @@ public class PlayerEventListener {
     @Listener
     public void onPlayerSendCommand(SendCommandEvent event, @First Player player) {
         String command = event.getCommand();
-        FlagPath flagPath = new FlagPath(Flags.SEND_COMMAND).add(command);
+        FlagPath flagPath = new FlagPath(FlagKeys.SEND_COMMAND).add(command);
         checkAndCancelIfNeeded(event, player, player.getLocation(), flagPath);
     }
 
@@ -249,7 +249,7 @@ public class PlayerEventListener {
 
         Player player = (Player) targetEntity;
         DamageType damageType = source.getType();
-        FlagPath flagPath = new FlagPath(Flags.NOT_TAKE_DAMAGE).add(getId(damageType));
+        FlagPath flagPath = new FlagPath(FlagKeys.NOT_TAKE_DAMAGE).add(getId(damageType));
         checkAndCancelIfNeeded(event, player, player.getLocation(), flagPath, true);
     }
 

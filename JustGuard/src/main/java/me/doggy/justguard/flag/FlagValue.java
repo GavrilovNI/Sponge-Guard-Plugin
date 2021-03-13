@@ -69,6 +69,13 @@ public class FlagValue {
         return this.getString(null);
     }
 
+    //back parse function
+    public String getValueToString() {
+        if(value == null)
+            return "null";
+        return value.toString();
+    }
+
     @Override
     public String toString() {
         return this.getClass().getName() + "(" + (value == null ? "null" : value.toString()) + ")";

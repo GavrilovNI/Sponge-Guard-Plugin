@@ -1,7 +1,8 @@
 package me.doggy.justguard.region;
 
-import me.doggy.justguard.consts.Flags;
+import me.doggy.justguard.consts.FlagKeys;
 import me.doggy.justguard.flag.FlagPath;
+import me.doggy.justguard.flag.Flags;
 import me.doggy.justguard.utils.FlagUtils;
 import me.doggy.justguard.utils.help.GsonableWorld;
 import me.doggy.justguard.utils.help.MyAABB;
@@ -30,10 +31,10 @@ public class Region<E extends World> {
     private MyAABB bounds;
 
     protected Map<UUID, PlayerOwnership> playerOwnerships;
-    transient protected ConfigurationNode flags;
+    transient protected Flags flags;
     protected int priority;
 
-    public Region(E world, MyAABB bounds, ConfigurationNode flags)
+    public Region(E world, MyAABB bounds, Flags flags)
     {
         this.world = new GsonableWorld(world);
         this.bounds = bounds;
@@ -57,8 +58,8 @@ public class Region<E extends World> {
     public void setBounds(MyAABB bounds) {
         this.bounds = bounds;
     }
-    public ConfigurationNode getFlags() { return flags; }
-    public void setFlags(ConfigurationNode flags) { this.flags = flags; }
+    public Flags getFlags() { return flags; }
+    public void setFlags(Flags flags) { this.flags = flags; }
     public void setPriority(int priority) { this.priority = priority; }
 
     public void setPlayerOwnership(UUID uuid, PlayerOwnership value)
@@ -97,16 +98,24 @@ public class Region<E extends World> {
 
     @NonNull
     public FlagValue getFlag(FlagPath path) {
-        return FlagUtils.getFlag(flags, path);
+        return flags.getFlag(path);
     }
-
     @NonNull
     public FlagValue getPlayerFlag(Player player, FlagPath path) {
         String playerStateKey = getPlayerOwnership(player.getUniqueId()).name().toLowerCase();
-        return getFlag(new FlagPath(Flags.PLAYER, playerStateKey).add(path));
+        return getFlag(new FlagPath(FlagKeys.PLAYER, playerStateKey).add(path));
     }
 
-
+    @NonNull
+    public FlagValue setFlag(FlagPath path, FlagValue value) {
+        return flags.setFlag(path, value);
+    }
+    @NonNull
+    public FlagValue setPlayerFlag(Player player, FlagPath path, FlagValue value) {
+        String playerStateKey = getPlayerOwnership(player.getUniqueId()).name().toLowerCase();
+        FlagPath newFlagPath = new FlagPath(FlagKeys.PLAYER, playerStateKey).add(path);
+        return setFlag(newFlagPath, value);
+    }
 
 
 

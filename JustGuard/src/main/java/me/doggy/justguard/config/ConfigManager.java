@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import javafx.util.Pair;
 import me.doggy.justguard.JustGuard;
+import me.doggy.justguard.flag.Groups;
 import me.doggy.justguard.region.Region;
 import me.doggy.justguard.utils.FileUtils;
 import me.doggy.justguard.utils.RegionUtils;
@@ -28,7 +29,7 @@ public class ConfigManager {
     private File regionsDir;
 
     private ConfigurationNode defaultRegionFlags;
-    private ConfigurationNode groups;
+    private Groups groups;
 
 
     public ConfigManager(Path configDir) {
@@ -39,7 +40,7 @@ public class ConfigManager {
     public File getConfigDir() { return configDir; }
     public File getRegionsDir() { return regionsDir; }
     public ConfigurationNode getDefaultRegionFlags() { return defaultRegionFlags; }
-    public ConfigurationNode getGroups() { return groups; }
+    public Groups getGroups() { return groups; }
 
     public void loadConfig() {
 
@@ -47,7 +48,7 @@ public class ConfigManager {
         this.regionsDir.mkdirs();
 
         this.defaultRegionFlags = FileUtils.getFileNode("defaultFlags.conf", configDir);
-        this.groups = FileUtils.getFileNode("groups.conf", configDir);
+        this.groups = new Groups(FileUtils.getFileNode("groups.conf", configDir));
 
         TextManager.load();
 
