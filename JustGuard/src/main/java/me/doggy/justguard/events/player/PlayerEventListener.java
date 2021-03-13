@@ -11,6 +11,7 @@ import me.doggy.justguard.utils.MessageUtils;
 import org.slf4j.Logger;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.block.BlockSnapshot;
+import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntitySnapshot;
@@ -21,6 +22,7 @@ import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.Event;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
+import org.spongepowered.api.event.block.CollideBlockEvent;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.cause.EventContext;
 import org.spongepowered.api.event.cause.EventContextKeys;
@@ -81,8 +83,18 @@ public class PlayerEventListener {
         FlagPath result = new FlagPath(lastId);
         return result;
     }
-    private FlagPath getId(CatalogType catalogType) {
-        String lastId = catalogType.getId().toLowerCase();
+    private FlagPath getId(BlockState blockState) {
+        String lastId = blockState.getType().getId().toLowerCase();
+        FlagPath result = new FlagPath(lastId);
+        return result;
+    }
+    private FlagPath getId(SpawnType spawnType) {
+        String lastId = spawnType.getId().toLowerCase();
+        FlagPath result = new FlagPath(lastId);
+        return result;
+    }
+    private FlagPath getId(DamageType damageType) {
+        String lastId = damageType.getId().toLowerCase();
         FlagPath result = new FlagPath(lastId);
         return result;
     }
@@ -137,6 +149,12 @@ public class PlayerEventListener {
         BlockSnapshot blockSnapshot = event.getTargetBlock();
         FlagPath flagPath = new FlagPath(FlagKeys.BLOCK_INTERACT, FlagKeys.SECONDARY).add(getId(blockSnapshot));
         checkAndCancelIfNeeded(event, player, blockSnapshot.getLocation(), flagPath);
+    }
+    @Listener
+    public void onPlayerCollideBlock(CollideBlockEvent event, @First Player player) {
+        BlockState blockState = event.getTargetBlock();
+        FlagPath flagPath = new FlagPath(FlagKeys.BLOCK_COLLIDE).add(getId(blockState));
+        checkAndCancelIfNeeded(event, player, event.getTargetLocation(), flagPath);
     }
 
     @Listener
@@ -219,17 +237,8 @@ public class PlayerEventListener {
             checkAndCancelIfNeeded(event, playerSource, targetEntity.getLocation(), flagPath);
         }
     }
-    /*@Listener
-    public void onPlayerCollideEntity(CollideEntityEvent event, @First Player player) {
-        FlagPath flagPathPrefix = new FlagPath(FlagKeys.ENTITY_COLLIDE);
-        for (Entity entity : event.getEntities()) {
-            FlagPath currFlagPath = new FlagPath(flagPathPrefix).add(getId(entity));
-            if(!checkAndCancelIfNeeded(event, player, entity.getLocation(), currFlagPath))
-                return;
-        }
-    }*/
 
-    public boolean onPlayerCollideEntity(CollideEntityEvent event, Player player, List<Entity> entities) {
+    private boolean onPlayerCollideEntity(CollideEntityEvent event, Player player, List<Entity> entities) {
         FlagPath flagPathPrefix = new FlagPath(FlagKeys.ENTITY_COLLIDE);
         for (Entity entity : entities) {
             if(entity.equals(player))
@@ -256,33 +265,6 @@ public class PlayerEventListener {
             }
         }
     }
-
-    /*public boolean onPlayerCollideEntity(CollideEntityEvent.Impact event, Player player, List<Entity> entities) {
-
-        FlagPath flagPathPrefix = new FlagPath(FlagKeys.ITEM_DROP);
-        for (ItemStackSnapshot droppedItemStackSnapshot : event.getDroppedItems()) {
-            FlagPath currFlagPath = new FlagPath(flagPathPrefix).add(getId(droppedItemStackSnapshot));
-            if(!checkAndCancelIfNeeded(event, player, player.getLocation(), currFlagPath))
-                return true;
-        }
-
-        return false;
-    }
-
-    @Listener
-    public void onPlayerCollideEntityListener(CollideEntityEvent.Impact event, @First Player player) {
-        logger.info("QWEHERE1");
-        onPlayerCollideEntity(event, player, event.getEntities());
-    }
-    @Listener
-    public void onPlayerCollideEntityListener(CollideEntityEvent event) {
-        logger.info("QWEHERE2");
-        List<Player> players = (List) event.getEntities().stream().filter(e->e instanceof Player).collect(Collectors.toList());
-        for (Player player : players) {
-            if(onPlayerCollideEntity(event, player, event.getEntities()))
-                break;
-        }
-    }*/
 
     @Listener
     public void onPlayerDropItem(DropItemEvent.Pre event, @First Player player) {
@@ -335,7 +317,6 @@ public class PlayerEventListener {
     public void test(HarvestEntityEvent event, @First Player player) {
         logger.info(event.getClass().getSimpleName() + ": " + event.getCause().toString());
     }
-
 
 
 
