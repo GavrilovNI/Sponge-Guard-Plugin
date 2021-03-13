@@ -6,16 +6,19 @@ import me.doggy.justguard.consts.FlagKeys;
 import me.doggy.justguard.consts.Texts;
 import me.doggy.justguard.flag.FlagPath;
 import me.doggy.justguard.utils.FlagUtils;
+import me.doggy.justguard.utils.InventoryUtils;
 import me.doggy.justguard.utils.MessageUtils;
 import org.slf4j.Logger;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.block.BlockSnapshot;
-import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.event.Cancellable;
+import org.spongepowered.api.event.Event;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.block.InteractBlockEvent;
@@ -29,9 +32,8 @@ import org.spongepowered.api.event.command.SendCommandEvent;
 import org.spongepowered.api.event.entity.*;
 import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.event.filter.cause.Root;
-import org.spongepowered.api.event.item.inventory.DropItemEvent;
-import org.spongepowered.api.event.item.inventory.InteractInventoryEvent;
-import org.spongepowered.api.event.item.inventory.InteractItemEvent;
+import org.spongepowered.api.event.item.inventory.*;
+import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.Location;
@@ -39,6 +41,7 @@ import org.spongepowered.api.world.World;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class PlayerEventListener {
 
@@ -63,6 +66,12 @@ public class PlayerEventListener {
     }
     private FlagPath getId(Entity entity) {
         String lastId = entity.getType().getId();
+        FlagPath result = new FlagPath(lastId);
+
+        return result;
+    }
+    private FlagPath getId(EntitySnapshot entitySnapshot) {
+        String lastId = entitySnapshot.getType().getId();
         FlagPath result = new FlagPath(lastId);
 
         return result;
@@ -118,20 +127,20 @@ public class PlayerEventListener {
     }
 
     @Listener
-    public void onInteractBlockByPlayer_Primary(InteractBlockEvent.Primary event, @First Player player) {
+    public void onPlayerInteractBlock_Primary(InteractBlockEvent.Primary event, @First Player player) {
         BlockSnapshot blockSnapshot = event.getTargetBlock();
         FlagPath flagPath = new FlagPath(FlagKeys.BLOCK_INTERACT, FlagKeys.PRIMARY).add(getId(blockSnapshot));
         checkAndCancelIfNeeded(event, player, blockSnapshot.getLocation(), flagPath);
     }
     @Listener
-    public void onInteractBlockByPlayer_Secondary(InteractBlockEvent.Secondary event, @First Player player) {
+    public void onPlayerInteractBlock_Secondary(InteractBlockEvent.Secondary event, @First Player player) {
         BlockSnapshot blockSnapshot = event.getTargetBlock();
         FlagPath flagPath = new FlagPath(FlagKeys.BLOCK_INTERACT, FlagKeys.SECONDARY).add(getId(blockSnapshot));
         checkAndCancelIfNeeded(event, player, blockSnapshot.getLocation(), flagPath);
     }
 
     @Listener
-    public void onInteractInventoryByPlayer_Open(InteractInventoryEvent.Open event, @First Player player) {
+    public void onPlayerOpenInventory(InteractInventoryEvent.Open event, @First Player player) {
         EventContext context = event.getContext();
         Optional<BlockSnapshot> blockHitOpt = context.get(EventContextKeys.BLOCK_HIT);
         if(!blockHitOpt.isPresent())
@@ -143,49 +152,57 @@ public class PlayerEventListener {
     }
 
     @Listener
-    public void onChangeBlockByPlayer_Break(ChangeBlockEvent.Break event, @First Player player) {
+    public void onPlayerBreakBlock(ChangeBlockEvent.Break event, @First Player player) {
         checkAndCancelIfNeeded(event, player, t->(BlockSnapshot) t.getFinal(), new FlagPath(FlagKeys.BLOCK_BREAK));
     }
     @Listener
-    public void onChangeBlockByPlayer_Place(ChangeBlockEvent.Place event, @First Player player) {
+    public void onPlayerPlaceBlock(ChangeBlockEvent.Place event, @First Player player) {
         checkAndCancelIfNeeded(event, player, t->(BlockSnapshot) t.getFinal(), new FlagPath(FlagKeys.BLOCK_PLACE));
     }
 
     @Listener
-    public void onInteractEntityByPlayer_Primary(InteractEntityEvent.Primary event, @First Player player) {
+    public void onPlayerInteractEntity_Primary(InteractEntityEvent.Primary event, @First Player player) {
         Entity targetEntity = event.getTargetEntity();
         FlagPath flagPath = new FlagPath(FlagKeys.ENTITY_INTERACT, FlagKeys.PRIMARY).add(getId(targetEntity));
         checkAndCancelIfNeeded(event, player, targetEntity.getLocation(), flagPath);
-
-        logger.info("tileentity: " + String.valueOf(targetEntity instanceof TileEntity));
     }
     @Listener
-    public void onInteractEntityByPlayer_Secondary(InteractEntityEvent.Secondary event, @First Player player) {
+    public void onPlayerInteractEntity_Secondary(InteractEntityEvent.Secondary event, @First Player player) {
         Entity targetEntity = event.getTargetEntity();
         FlagPath flagPath = new FlagPath(FlagKeys.ENTITY_INTERACT, FlagKeys.SECONDARY).add(getId(targetEntity));
         checkAndCancelIfNeeded(event, player, targetEntity.getLocation(), flagPath);
-
-        logger.info("tileentity: " + String.valueOf(targetEntity instanceof TileEntity));
     }
     @Listener
-    public void onSpawnEntityByPlayer(SpawnEntityEvent event, @First Player player) {
+    public void onPlayerSpawnEntity(SpawnEntityEvent event, @First Player player) {
         Optional<SpawnType> spawnTypeOpt = event.getContext().get(EventContextKeys.SPAWN_TYPE);
         if(!spawnTypeOpt.isPresent())
             return;
+        if(!event.getContext().get(EventContextKeys.PLAYER_PLACE).isPresent()) // if so - thats not a placement, this can be dropped item
+            return;
 
-        List<Entity> entities = event.getEntities();
-        for (Entity targetEntity : entities) {
+
+        for (Entity targetEntity : event.getEntities()) {
             FlagPath flagPath = new FlagPath(FlagKeys.ENTITY_SPAWN).add(getId(spawnTypeOpt.get())).add(getId(targetEntity));
-            if(!checkAndCancelIfNeeded(event, player, targetEntity.getLocation(), flagPath))
-                return;
-        }
-    }
+            if(!checkAndCancelIfNeeded(event, player, targetEntity.getLocation(), flagPath)) {
 
+                if(!player.gameMode().get().equals(GameModes.CREATIVE)) {
+                    Optional<ItemStackSnapshot> usedItemOpt = event.getContext().get(EventContextKeys.USED_ITEM);
+                    if (usedItemOpt.isPresent()) {
+                        ItemStack itemStackToReturn = usedItemOpt.get().createStack();
+                        itemStackToReturn.setQuantity(1);
+
+                        //we dont return item immediately because of bug(if u return item with max stack 1, and u return it to position event has removed this from, it wont be returned)
+                        InventoryUtils.addItemStackToInventoryDelayed(player, itemStackToReturn);
+                    }
+                }
+                break;
+            }
+        }
+
+
+    }
     @Listener
     public void onPlayerAttackEntity(AttackEntityEvent event, @Root EntityDamageSource entityDamageSource) {
-
-        logger.info("onPlayerAttackEntity");
-        logger.info(event.getContext().toString());
 
         Entity targetEntity = event.getTargetEntity();
 
@@ -202,34 +219,123 @@ public class PlayerEventListener {
             checkAndCancelIfNeeded(event, playerSource, targetEntity.getLocation(), flagPath);
         }
     }
-    @Listener
-    public void test(DropItemEvent event, @First Player player) {
-        logger.info("DropItemEvent");
-        logger.info(event.getContext().toString());
+    /*@Listener
+    public void onPlayerCollideEntity(CollideEntityEvent event, @First Player player) {
+        FlagPath flagPathPrefix = new FlagPath(FlagKeys.ENTITY_COLLIDE);
+        for (Entity entity : event.getEntities()) {
+            FlagPath currFlagPath = new FlagPath(flagPathPrefix).add(getId(entity));
+            if(!checkAndCancelIfNeeded(event, player, entity.getLocation(), currFlagPath))
+                return;
+        }
+    }*/
+
+    public boolean onPlayerCollideEntity(CollideEntityEvent event, Player player, List<Entity> entities) {
+        FlagPath flagPathPrefix = new FlagPath(FlagKeys.ENTITY_COLLIDE);
+        for (Entity entity : entities) {
+            if(entity.equals(player))
+                continue;
+            FlagPath currFlagPath = new FlagPath(flagPathPrefix).add(getId(entity));
+            if(!checkAndCancelIfNeeded(event, player, entity.getLocation(), currFlagPath))
+                return true;
+        }
+        return false;
     }
 
     @Listener
-    public void test(HarvestEntityEvent event, @First Player player) {
-        logger.info("HarvestEntityEvent");
-    }
-    @Listener
-    public void test(CollideEntityEvent event, @First Player player) {
-        logger.info("CollideEntityEvent");
+    public void onPlayerCollideEntityListener(CollideEntityEvent event) {
+
+        List<Entity> entities = event.getEntities();
+        Object source = event.getSource();
+        if (source instanceof Entity)
+            entities.add((Entity) source);
+
+        for (Entity entity : entities) {
+            if(entity instanceof Player) {
+                if(onPlayerCollideEntity(event, (Player) entity, entities))
+                    break;
+            }
+        }
     }
 
+    /*public boolean onPlayerCollideEntity(CollideEntityEvent.Impact event, Player player, List<Entity> entities) {
+
+        FlagPath flagPathPrefix = new FlagPath(FlagKeys.ITEM_DROP);
+        for (ItemStackSnapshot droppedItemStackSnapshot : event.getDroppedItems()) {
+            FlagPath currFlagPath = new FlagPath(flagPathPrefix).add(getId(droppedItemStackSnapshot));
+            if(!checkAndCancelIfNeeded(event, player, player.getLocation(), currFlagPath))
+                return true;
+        }
+
+        return false;
+    }
 
     @Listener
-    public void onInteractItemByPlayer_Primary(InteractItemEvent.Primary event, @First Player player) {
+    public void onPlayerCollideEntityListener(CollideEntityEvent.Impact event, @First Player player) {
+        logger.info("QWEHERE1");
+        onPlayerCollideEntity(event, player, event.getEntities());
+    }
+    @Listener
+    public void onPlayerCollideEntityListener(CollideEntityEvent event) {
+        logger.info("QWEHERE2");
+        List<Player> players = (List) event.getEntities().stream().filter(e->e instanceof Player).collect(Collectors.toList());
+        for (Player player : players) {
+            if(onPlayerCollideEntity(event, player, event.getEntities()))
+                break;
+        }
+    }*/
+
+    @Listener
+    public void onPlayerDropItem(DropItemEvent.Pre event, @First Player player) {
+        FlagPath flagPathPrefix = new FlagPath(FlagKeys.ITEM_DROP);
+        for (ItemStackSnapshot droppedItemStackSnapshot : event.getDroppedItems()) {
+            FlagPath currFlagPath = new FlagPath(flagPathPrefix).add(getId(droppedItemStackSnapshot));
+            if(!checkAndCancelIfNeeded(event, player, player.getLocation(), currFlagPath))
+                return;
+        }
+    }
+    @Listener
+    public void onPlayerPickupItem(ChangeInventoryEvent.Pickup.Pre event, @First Player player) {
+        FlagPath flagPathPrefix = new FlagPath(FlagKeys.ITEM_PICKUP);
+        for (ItemStackSnapshot pickedupItemStackSnapshot : event.getFinal()) {
+            FlagPath currFlagPath = new FlagPath(flagPathPrefix).add(getId(pickedupItemStackSnapshot));
+            if(!checkAndCancelIfNeeded(event, player, event.getTargetEntity().getLocation(), currFlagPath))
+                return;
+        }
+    }
+    @Listener
+    public void onPlayerInteractItem_Primary(InteractItemEvent.Primary event, @First Player player) {
         ItemStackSnapshot itemStackSnapshot = event.getItemStack();
         FlagPath flagPath = new FlagPath(FlagKeys.ITEM_INTERACT, FlagKeys.PRIMARY).add(getId(itemStackSnapshot));
         checkAndCancelIfNeeded(event, player, player.getLocation(), flagPath);
     }
     @Listener
-    public void onInteractItemByPlayer_Secondary(InteractItemEvent.Secondary event, @First Player player) {
+    public void onPlayerInteractItem_Secondary(InteractItemEvent.Secondary event, @First Player player) {
         ItemStackSnapshot itemStackSnapshot = event.getItemStack();
         FlagPath flagPath = new FlagPath(FlagKeys.ITEM_INTERACT, FlagKeys.SECONDARY).add(getId(itemStackSnapshot));
         checkAndCancelIfNeeded(event, player, player.getLocation(), flagPath);
     }
+    @Listener
+    public void onPlayerUseItem(UseItemStackEvent.Start event, @First Player player) {
+        ItemStackSnapshot itemStackSnapshot = event.getItemStackInUse();
+        FlagPath flagPath = new FlagPath(FlagKeys.ITEM_USE).add(getId(itemStackSnapshot));
+        checkAndCancelIfNeeded(event, player, player.getLocation(), flagPath);
+    }
+
+
+    /*@Listener
+    public void test(ConstructEntityEvent.Pre event) {
+        logger.info(event.getClass().getSimpleName() + ": " + event.getCause().toString());
+    }
+    @Listener
+    public void test(ConstructEntityEvent.Post event) {
+        logger.info(event.getClass().getSimpleName() + ": " + event.getCause().toString());
+    }*/
+
+    @Listener
+    public void test(HarvestEntityEvent event, @First Player player) {
+        logger.info(event.getClass().getSimpleName() + ": " + event.getCause().toString());
+    }
+
 
 
 

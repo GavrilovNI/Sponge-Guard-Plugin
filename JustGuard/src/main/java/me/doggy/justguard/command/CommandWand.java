@@ -21,7 +21,7 @@ public class CommandWand implements CommandExecutor
         }
 
         Player player = (Player) src;
-        InventoryUtils.addItemStackToInventory(player, InventoryUtils.GetSelector());
+        InventoryUtils.addItemStackToInventoryDelayed(player, InventoryUtils.GetSelector());
         src.sendMessage(Text.of(TextManager.getText(Texts.CMD_ANSWER_WAND)));
 
         return CommandResult.success();

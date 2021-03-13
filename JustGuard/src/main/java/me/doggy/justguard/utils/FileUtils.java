@@ -64,12 +64,10 @@ public class FileUtils {
                 HoconConfigurationLoader.builder().setPath(file.toPath()).build();
         ConfigurationNode rootNode;
 
-        try
-        {
+        try {
             rootNode = loader.load();
         }
-        catch(IOException e)
-        {
+        catch(IOException e) {
             logger.error("'"+name+"' not loaded.", e);
             return null;
         }
