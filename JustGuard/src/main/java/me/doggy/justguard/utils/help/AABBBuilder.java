@@ -1,7 +1,7 @@
 package me.doggy.justguard.utils.help;
 
 import com.flowpowered.math.vector.Vector3d;
-import me.doggy.justguard.JustGuard;
+import com.flowpowered.math.vector.Vector3i;
 import org.spongepowered.api.util.Direction;
 
 import java.util.Arrays;
@@ -14,26 +14,27 @@ public class AABBBuilder {
         Second
     }
 
-    public Vector3d firstCorner = Vector3d.ZERO;
-    public Vector3d secondCorner = Vector3d.ZERO;
+    private Vector3i firstValue, secondValue;
 
-    public AABBBuilder setFirst(Vector3d value){
-        firstCorner = value;
+    public AABBBuilder() {
+        this.firstValue = new Vector3i(0, 0, 0);
+        this.secondValue = new Vector3i(0, 0, 0);
+    }
+
+    public AABBBuilder setFirstBlock(Vector3i value){
+        this.firstValue = value;
+        return this;
+    }
+    public AABBBuilder setSecondBlock(Vector3i value){
+        this.secondValue = value;
         return this;
     }
 
-    public AABBBuilder setSecond(Vector3d value){
-        secondCorner = value;
-        return this;
-    }
-
-    public AABBBuilder set(Vector3d value, BoundType boundType){
-
+    public AABBBuilder set(Vector3i value, BoundType boundType){
         if(boundType.equals(BoundType.First))
-            setFirst(value);
+            setFirstBlock(value);
         else
-            setSecond(value);
-
+            setSecondBlock(value);
         return this;
     }
 
@@ -49,15 +50,14 @@ public class AABBBuilder {
         if (!isDirectionAvaliableToExpand(direction))
             throw new IllegalArgumentException("Direction '" + direction.name() + "' not supported.");
 
-        Vector3d offset = direction.asBlockOffset().toDouble().normalize();
+        Vector3i offset = direction.asBlockOffset().mul(num);
 
-        Vector3d newFirstCorner = firstCorner.add(offset.mul(num));
-        if(newFirstCorner.distanceSquared(secondCorner) > firstCorner.distanceSquared(secondCorner)) {
-            firstCorner = newFirstCorner;
-        }
-        else {
-            secondCorner = secondCorner.add(offset.mul(num));
-        }
+        //i can do so, because available only simple directions
+        Vector3i newPossibleFirstValue = firstValue.add(offset);
+        if(newPossibleFirstValue.distanceSquared(secondValue) > firstValue.distanceSquared(secondValue))
+            firstValue = newPossibleFirstValue;
+        else
+            secondValue = secondValue.add(offset);
 
         return this;
     }
@@ -74,15 +74,12 @@ public class AABBBuilder {
     {
         final int maxY = 255;
 
-        if(firstCorner.getY() < secondCorner.getY())
-        {
-            firstCorner = new Vector3d(firstCorner.getX(), 0, firstCorner.getZ());
-            secondCorner = new Vector3d(secondCorner.getX(), maxY, secondCorner.getZ());
-        }
-        else
-        {
-            firstCorner = new Vector3d(firstCorner.getX(), maxY, firstCorner.getZ());
-            secondCorner = new Vector3d(secondCorner.getX(), 0, secondCorner.getZ());
+        if(firstValue.getY() < secondValue.getY()) {
+            firstValue = new Vector3i(firstValue.getX(), 0, firstValue.getZ());
+            secondValue = new Vector3i(secondValue.getX(), maxY, secondValue.getZ());
+        } else {
+            firstValue = new Vector3i(firstValue.getX(), maxY, firstValue.getZ());
+            secondValue = new Vector3i(secondValue.getX(), 0, secondValue.getZ());
         }
 
         return this;
@@ -90,8 +87,8 @@ public class AABBBuilder {
 
     public MyAABB build()
     {
-        Vector3d a = firstCorner.min(secondCorner);
-        Vector3d b = firstCorner.max(secondCorner).add(Vector3d.ONE);
+        Vector3d a = firstValue.min(secondValue).toDouble();
+        Vector3d b = firstValue.max(secondValue).toDouble().add(Vector3d.ONE);
         return new MyAABB(a, b);
     }
 

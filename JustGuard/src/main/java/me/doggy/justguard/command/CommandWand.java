@@ -16,7 +16,7 @@ public class CommandWand implements CommandExecutor
 
     public CommandResult execute(CommandSource src, CommandContext args)
     {
-        if(!CommandUtils.cmdOnlyForPlayers(src, true)) {
+        if(!CommandUtils.isPlayerExecuteCmd(src)) {
             return CommandResult.success();
         }
 

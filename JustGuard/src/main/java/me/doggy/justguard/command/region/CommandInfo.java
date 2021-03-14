@@ -1,14 +1,12 @@
 package me.doggy.justguard.command.region;
 
-import com.google.common.collect.Lists;
+import me.doggy.justguard.RegionsHolder;
 import me.doggy.justguard.command.CommandsRegistrator;
 import me.doggy.justguard.config.TextManager;
 import me.doggy.justguard.consts.Texts;
 import me.doggy.justguard.region.Region;
 import me.doggy.justguard.utils.CommandUtils;
 import me.doggy.justguard.utils.MessageUtils;
-import me.doggy.justguard.utils.RegionUtils;
-import me.doggy.justguard.utils.help.RegionPair;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
@@ -16,9 +14,7 @@ import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class CommandInfo implements CommandExecutor
 {
@@ -36,17 +32,24 @@ public class CommandInfo implements CommandExecutor
             }
 
             String regionId = regionIdOpt.get();
+            Region region = RegionsHolder.getRegion(regionId);
 
-            Region region = RegionUtils.getAllRegions().get(regionId);
+            if(region == null) {
+                MessageUtils.SendError(src, Text.of(TextManager.getText(
+                        Texts.ERR_NO_REGION_FOUND,
+                        regionId
+                )));
+                return CommandResult.success();
+            }
 
-            //send region info here
             MessageUtils.Send(src, Text.of(regionId + ": "));
             MessageUtils.SendRegionInfo(src, region);
+
 
         }
         else
         {
-            if(!CommandUtils.cmdOnlyForPlayers(src, true)) {
+            if(!CommandUtils.isPlayerExecuteCmd(src)) {
                 return CommandResult.success();
             }
 
@@ -54,12 +57,12 @@ public class CommandInfo implements CommandExecutor
             int page = pageOpt.orElse(1);
 
             Player player = (Player) src;
-            List<RegionPair> regions = RegionUtils.getRegionsInLocation(player.getLocation());
+            Map<String, Region> regions = RegionsHolder.getRegions(x -> x.getValue().contains(player.getLocation()));
 
-            MessageUtils.SendList(src, Arrays.asList(regions.toArray()), page, pageLength, (key) -> {
-                RegionPair regionPair = (RegionPair) key;
-                MessageUtils.Send(src, Text.of(regionPair.name + ": "));
-                MessageUtils.SendRegionInfo(src, regionPair.region);
+            MessageUtils.SendList(src, Arrays.asList(regions.entrySet()), page, pageLength, (key) -> {
+                Map.Entry<String, Region> regionPair = (Map.Entry<String, Region>) key;
+                MessageUtils.Send(src, Text.of(regionPair.getKey() + ": "));
+                MessageUtils.SendRegionInfo(src, regionPair.getValue());
             });
 
         }

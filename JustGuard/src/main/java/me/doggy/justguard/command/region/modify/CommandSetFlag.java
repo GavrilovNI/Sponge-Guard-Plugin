@@ -1,6 +1,7 @@
 package me.doggy.justguard.command.region.modify;
 
 import me.doggy.justguard.JustGuard;
+import me.doggy.justguard.RegionsHolder;
 import me.doggy.justguard.command.CommandsRegistrator;
 import me.doggy.justguard.config.TextManager;
 import me.doggy.justguard.consts.Texts;
@@ -38,16 +39,17 @@ public class CommandSetFlag implements CommandExecutor
         String flag = flagOpt.get();
         FlagValue newValue = FlagValue.parse(valueOpt.get());
 
-        Region region = JustGuard.REGIONS.get(regionId);
-
-        if(!CommandUtils.canContinueModifyRegion(region, src, true))
-            return CommandResult.success();
+        Region region = RegionsHolder.getRegion(regionId);
 
         FlagPath flagPath = FlagPath.parse(flag);
         if(flagPath.isEmpty()) {
             MessageUtils.SendError(src, Text.of(TextManager.getText(Texts.ERR_CMD_NOT_ENOUGH_ARGUMENTS)));
             return CommandResult.success();
         }
+        if(!CommandUtils.isRegionFound(src, region, regionId))
+            return CommandResult.success();
+        if(!CommandUtils.canModifyRegion(src, region, regionId))
+            return CommandResult.success();
 
         FlagValue oldValue = region.setFlag(flagPath, newValue);
 

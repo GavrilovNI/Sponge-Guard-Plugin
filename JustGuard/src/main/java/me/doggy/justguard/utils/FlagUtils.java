@@ -1,13 +1,10 @@
 package me.doggy.justguard.utils;
 
 import me.doggy.justguard.JustGuard;
+import me.doggy.justguard.RegionsHolder;
 import me.doggy.justguard.config.ConfigManager;
 import me.doggy.justguard.flag.FlagPath;
-import me.doggy.justguard.flag.Groups;
-import me.doggy.justguard.utils.help.RegionPair;
-import me.doggy.justguard.flag.FlagValue;
-import ninja.leaping.configurate.ConfigurationNode;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import me.doggy.justguard.region.Region;
 import org.slf4j.Logger;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.Location;
@@ -21,18 +18,18 @@ public class FlagUtils {
     private static final ConfigManager configManager = JustGuard.getInstance().getConfigManager();
 
 
-    public static boolean hasPlayerFlagAccess(Player player, List<RegionPair> regions, FlagPath path)
-    {
-        for (RegionPair regionPair : regions) {
-            if(!regionPair.region.getPlayerFlag(player, path).getBoolean(false)) {
+    public static boolean hasPlayerFlagAccess(Player player, Map<String, Region> regions, FlagPath path) {
+        for (Map.Entry<String, Region> regionPair : regions.entrySet()) {
+            if(!regionPair.getValue().getPlayerFlag(player, path).getBoolean(false)) {
                 return false;
             }
         }
         return true;
     }
-    public static boolean hasPlayerFlagAccess(Player player, Location<World> location, FlagPath path)
-    {
-        List<RegionPair> regions = RegionUtils.getHighestPriorityRegions(RegionUtils.getRegionsInLocation(location));
+    public static boolean hasPlayerFlagAccess(Player player, Location<World> location, FlagPath path) {
+        Map<String, Region> regions = RegionUtils.getHighestPriorityRegions(
+                RegionsHolder.getRegions(x -> x.getValue().contains(location))
+        );
         return hasPlayerFlagAccess(player, regions, path);
     }
 

@@ -14,6 +14,11 @@ public class Permissions {
     public static final String COMMAND_LOAD = COMMAND_PREFIX + "load";
     public static final String COMMAND_WAND = COMMAND_PREFIX + "wand";
 
+
+    private static final String COMMAND_TEST_PREFIX = COMMAND_PREFIX + "test.";
+    public static final String COMMAND_TEST_BASE = COMMAND_TEST_PREFIX + "base";
+    public static final String COMMAND_TEST_REMOVE = COMMAND_TEST_PREFIX + "remove";
+
     private static final String COMMAND_REGION_PREFIX = COMMAND_PREFIX + "region.";
     public static final String COMMAND_REGION_BASE = COMMAND_REGION_PREFIX + "base";
     public static final String COMMAND_REGION_LIST = COMMAND_REGION_PREFIX + "list";
@@ -41,7 +46,7 @@ public class Permissions {
 
     private static final String REGION_PREFIX = PREFIX + "region.";
 
-    public static final String REGION_REMOVE_ANY = REGION_PREFIX + "remove-any";
+    public static final String CAN_REMOVE_NON_OWNING_REGIONS = REGION_PREFIX + "remove-any";
     public static final String CAN_MODIFY_NON_OWNING_REGIONS = REGION_PREFIX + "can-modify-any";
 
     private static final String REGION_CLAIM_PREFIX = REGION_PREFIX + "claim.";

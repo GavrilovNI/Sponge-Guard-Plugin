@@ -1,6 +1,7 @@
 package me.doggy.justguard.command.region.modify;
 
 import me.doggy.justguard.JustGuard;
+import me.doggy.justguard.RegionsHolder;
 import me.doggy.justguard.command.CommandsRegistrator;
 import me.doggy.justguard.config.TextManager;
 import me.doggy.justguard.consts.Texts;
@@ -28,15 +29,18 @@ public class CommandSetOwnership implements CommandExecutor
         if(!regionIdOpt.isPresent() || !playerToChangeOpt.isPresent() || !stateOpt.isPresent())
             return CommandResult.builder().successCount(0).build();
 
-        Region region = JustGuard.REGIONS.get(regionIdOpt.get());
+        String regionId = regionIdOpt.get();
+        Region region = RegionsHolder.getRegion(regionId);
 
-        if(!CommandUtils.canContinueModifyRegion(region, src, true))
+        if(!CommandUtils.isRegionFound(src, region, regionId))
+            return CommandResult.success();
+        if(!CommandUtils.canModifyRegion(src, region, regionId))
             return CommandResult.success();
 
         region.setPlayerOwnership(playerToChangeOpt.get().getUniqueId(), stateOpt.get());
         MessageUtils.Send(src, Text.of(TextManager.getText(
                 Texts.CMD_ANSWER_SETOWNERSHIP,
-                regionIdOpt.get(),
+                regionId,
                 playerToChangeOpt.get().getName(),
                 TextManager.getText(stateOpt.get().name().toLowerCase())
         )));

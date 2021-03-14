@@ -40,7 +40,7 @@ public class EventRegionSelect {
             if(createdRegion == null) {
                 createdRegion = Pending.createRegion(player, Pending.RegionType.Local, JustGuard.getInstance().getConfigManager().getDefaultRegionFlags(), player.getWorld());
             }
-            createdRegion.aabbBuilder.set(position.toDouble(), boundType);
+            createdRegion.aabbBuilder.set(position, boundType);
 
             MessageUtils.Send(player, Text.of(TextManager.getText(
                     Texts.CMD_ANSWER_BOUND_SETTED,

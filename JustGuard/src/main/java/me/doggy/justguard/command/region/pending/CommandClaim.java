@@ -2,6 +2,7 @@ package me.doggy.justguard.command.region.pending;
 
 import com.flowpowered.math.vector.Vector3d;
 import me.doggy.justguard.JustGuard;
+import me.doggy.justguard.RegionsHolder;
 import me.doggy.justguard.command.CommandsRegistrator;
 import me.doggy.justguard.config.TextManager;
 import me.doggy.justguard.consts.Texts;
@@ -14,7 +15,6 @@ import me.doggy.justguard.Pending;
 import me.doggy.justguard.utils.RegionUtils;
 import me.doggy.justguard.utils.help.MyAABB;
 import me.doggy.justguard.utils.help.PendingRegion;
-import me.doggy.justguard.utils.help.RegionPair;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.model.user.User;
 import org.slf4j.Logger;
@@ -24,8 +24,8 @@ import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.util.AABB;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.List;
 
@@ -35,28 +35,28 @@ public class CommandClaim implements CommandExecutor
 
     public CommandResult execute(CommandSource source, CommandContext args)
     {
-        Optional<String> nameOpt = args.getOne(CommandsRegistrator.REGION_ID);
+        Optional<String> regionIdOpt = args.getOne(CommandsRegistrator.REGION_ID);
 
-        if(!nameOpt.isPresent())
+        if(!regionIdOpt.isPresent())
             return CommandResult.builder().successCount(0).build();
 
-        String name = nameOpt.get();
+        String regionId = regionIdOpt.get();
 
 
         PendingRegion region = Pending.getRegion(source);
         if(region==null)
             MessageUtils.SendError(source, Text.of(TextManager.getText(Texts.ERR_NO_PENDING_REGION_FOUND)));
-        else if(JustGuard.REGIONS.containsKey(name))
-            MessageUtils.SendError(source, Text.of(TextManager.getText(Texts.ERR_REGION_ALREADY_EXISTS, name)));
+        else if(RegionsHolder.hasRegion(regionId))
+            MessageUtils.SendError(source, Text.of(TextManager.getText(Texts.ERR_REGION_ALREADY_EXISTS, regionId)));
         else
         {
             if(hasPermission(source, region))
             {
-                if(Pending.uploadRegion(source, name)) {
-                    MessageUtils.Send(source, Text.of(TextManager.getText(Texts.CMD_ANSWER_REGION_CLAIMED, name)));
+                if(Pending.uploadRegion(source, regionId)) {
+                    MessageUtils.Send(source, Text.of(TextManager.getText(Texts.CMD_ANSWER_REGION_CLAIMED, regionId)));
                     if(source instanceof Player)
                     {
-                        Region uploadedRegion = JustGuard.REGIONS.get(name);
+                        Region uploadedRegion = RegionsHolder.getRegion(regionId);
                         uploadedRegion.setPlayerOwnership(((Player) source).getUniqueId(), Region.PlayerOwnership.Owner);
                     }
                 }
@@ -89,23 +89,23 @@ public class CommandClaim implements CommandExecutor
                 if (regionVolume > maxSize) {
                     MessageUtils.SendError(source, Text.of(TextManager.getText(
                             Texts.MAX_REGION_SIZE_VIOLATION,
-                            String.valueOf(regionSize),
+                            String.valueOf(regionVolume),
                             String.valueOf(maxSize)
                     )));
                     return false;
                 }
             }
 
-            List<RegionPair> intersectRegions = RegionUtils.getRegionsIntersectWith(region.world, regionAABB);
-            for (RegionPair regionPair : intersectRegions)
+            Map<String, Region> intersectRegions = RegionsHolder.getRegions(x -> x.getValue().intersects(region.world, regionAABB));
+            for (Map.Entry<String, Region> regionPair : intersectRegions.entrySet())
             {
                 //intersect with, check for ownership
-                String playerStateStr = regionPair.region.getPlayerOwnership(player.getUniqueId()).name().toLowerCase();
+                String playerStateStr = regionPair.getValue().getPlayerOwnership(player.getUniqueId()).name().toLowerCase();
                 if(!player.hasPermission(Permissions.CAN_INTERSECT_REGION_WITH_OWNERSHIP_PREFIX + playerStateStr))
                 {
                     MessageUtils.SendError(source, Text.of(TextManager.getText(
                             Texts.NO_PERMISSION_TO_CLAIM_REGION_INTERSECT_WITH_REGION_OWNERSHIP,
-                            regionPair.name,
+                            regionPair.getKey(),
                             TextManager.getText(playerStateStr)
                     )));
                     return false;

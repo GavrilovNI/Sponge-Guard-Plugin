@@ -84,7 +84,7 @@ public class MessageUtils {
     public static void SendRegionInfo(MessageReceiver receiver, Region region)
     {
         Text[] texts = new Text[]{
-                Text.of( Texts.UUID + ": " + region.getUUID().toString()),
+                Text.of( Texts.UUID + ": " + region.getUniqueId().toString()),
                 Text.of(Texts.MIN_POSITION + ": " + region.getBounds().getMin().toString()),
                 Text.of(Texts.MAX_POSITION + ": " + region.getBounds().getMax().toString())
         };

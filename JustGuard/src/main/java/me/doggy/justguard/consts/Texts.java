@@ -13,7 +13,7 @@ public class Texts
     public static final String ERR_CMD_ONLY_FOR_PLAYERS = "err-cmd-only-for-players";
     public static final String ERR_REGION_NOT_FOUND = "err-region-not-found";
     public static final String ERR_NOT_REGION_OWNER = "err-not-region-owner";
-    public static final String ERR_NO_REGION_FOUND = "err-noo-region-found";
+    public static final String ERR_NO_REGION_FOUND = "err-no-region-found";
     public static final String ERR_WRONG_DIRECTION_TO_EXPAND = "err-wrong-direction-to-expand";
     public static final String ERR_CMD_TO_MUCH_ARGUMENTS = "err-cmd-to-much-arguments";
     public static final String ERR_CMD_NOT_ENOUGH_ARGUMENTS = "err-cmd-not-enough-arguments";

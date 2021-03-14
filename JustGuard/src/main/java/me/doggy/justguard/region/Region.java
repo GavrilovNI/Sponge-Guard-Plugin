@@ -10,13 +10,16 @@ import me.doggy.justguard.flag.FlagValue;
 import ninja.leaping.configurate.ConfigurationNode;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.util.Identifiable;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 
 import java.util.*;
 
-public class Region<E extends World> {
+public class Region<E extends World> implements Identifiable {
+
+
 
     public enum PlayerOwnership
     {
@@ -25,8 +28,7 @@ public class Region<E extends World> {
         Stranger
     }
 
-    protected UUID uuid;
-
+    private UUID uuid;
     private GsonableWorld<E> world;
     private MyAABB bounds;
 
@@ -44,7 +46,10 @@ public class Region<E extends World> {
         this.priority = 0;
     }
 
-    public UUID getUUID() { return uuid; }
+    @Override
+    public UUID getUniqueId() {
+        return uuid;
+    }
     public E getWorld()
     {
         return world.get();

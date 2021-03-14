@@ -171,7 +171,7 @@ public class PlayerEventListener {
 
     @Listener
     public void onPlayerBreakBlock(ChangeBlockEvent.Break event, @First Player player) {
-        checkAndCancelIfNeeded(event, player, t->(BlockSnapshot) t.getFinal(), new FlagPath(FlagKeys.BLOCK_BREAK));
+        checkAndCancelIfNeeded(event, player, t->(BlockSnapshot) t.getOriginal(), new FlagPath(FlagKeys.BLOCK_BREAK));
     }
     @Listener
     public void onPlayerPlaceBlock(ChangeBlockEvent.Place event, @First Player player) {

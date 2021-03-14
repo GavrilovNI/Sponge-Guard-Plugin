@@ -1,48 +1,58 @@
 package me.doggy.justguard.utils;
 
 import me.doggy.justguard.config.TextManager;
+import me.doggy.justguard.consts.Permissions;
 import me.doggy.justguard.consts.Texts;
 import me.doggy.justguard.region.Region;
-import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 
 public class CommandUtils {
 
-    public static boolean canContinueModifyRegion(Region region, CommandSource source, boolean sendError)
-    {
-        boolean result = true;
-        Text error = Text.EMPTY;
-
+    public static boolean isRegionFound(CommandSource source, Region region, String regionId) {
         if(region == null) {
-            result = false;
-            error = Text.of(TextManager.getText(Texts.ERR_NO_REGION_FOUND));
+            MessageUtils.SendError(source, Text.of(TextManager.getText(
+                    Texts.ERR_NO_REGION_FOUND,
+                    regionId
+            )));
+            return false;
         }
-        if(!RegionUtils.canModify(region, source)) {
-            result = false;
-            error = Text.of(TextManager.getText(Texts.ERR_NOT_REGION_OWNER));
-        }
-
-        if(!result && sendError)
-            MessageUtils.SendError(source, error);
-
-        return result;
+        return true;
     }
 
-    public static boolean cmdOnlyForPlayers(CommandSource source, boolean sendError)
-    {
-        boolean result = true;
-        Text error = Text.EMPTY;
+    public static boolean canModifyRegion(CommandSource source, Region region, String regionId) {
+        if(source.hasPermission(Permissions.CAN_MODIFY_NON_OWNING_REGIONS))
+            return true;
 
-        if (!(source instanceof Player)) {
-            result = false;
-            error = Text.of(TextManager.getText(Texts.ERR_CMD_ONLY_FOR_PLAYERS));
+        if(!RegionUtils.canModifyByCommand(region, source)) {
+            MessageUtils.SendError(source, Text.of(TextManager.getText(
+                    Texts.ERR_NOT_REGION_OWNER,
+                    regionId
+            )));
+            return false;
         }
+        return true;
+    }
+    public static boolean canRemoveRegion(CommandSource source, Region region, String regionId) {
+        if(source.hasPermission(Permissions.CAN_REMOVE_NON_OWNING_REGIONS))
+            return true;
 
-        if(!result && sendError)
-            MessageUtils.SendError(source, error);
+        if(!RegionUtils.canModifyByCommand(region, source)) {
+            MessageUtils.SendError(source, Text.of(TextManager.getText(
+                    Texts.ERR_NOT_REGION_OWNER,
+                    regionId
+            )));
+            return false;
+        }
+        return true;
+    }
 
-        return result;
+    public static boolean isPlayerExecuteCmd(CommandSource source) {
+        if (!(source instanceof Player)) {
+            MessageUtils.SendError(source, Text.of(TextManager.getText(Texts.ERR_CMD_ONLY_FOR_PLAYERS)));
+            return false;
+        }
+        return true;
     }
 }

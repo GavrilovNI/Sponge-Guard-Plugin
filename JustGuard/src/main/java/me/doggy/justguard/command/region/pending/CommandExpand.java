@@ -1,33 +1,20 @@
 package me.doggy.justguard.command.region.pending;
 
-import com.flowpowered.math.vector.Vector3d;
 import me.doggy.justguard.JustGuard;
 import me.doggy.justguard.Pending;
-import me.doggy.justguard.command.CommandsRegistrator;
 import me.doggy.justguard.config.TextManager;
-import me.doggy.justguard.consts.Metas;
-import me.doggy.justguard.consts.Permissions;
 import me.doggy.justguard.consts.Texts;
-import me.doggy.justguard.region.Region;
-import me.doggy.justguard.utils.MathUtils;
 import me.doggy.justguard.utils.MessageUtils;
-import me.doggy.justguard.utils.RegionUtils;
 import me.doggy.justguard.utils.help.AABBBuilder;
 import me.doggy.justguard.utils.help.PendingRegion;
-import me.doggy.justguard.utils.help.RegionPair;
-import net.luckperms.api.LuckPerms;
-import net.luckperms.api.model.user.User;
 import org.slf4j.Logger;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.util.Direction;
 
-import java.util.List;
 import java.util.Optional;
 
 public class CommandExpand implements CommandExecutor

@@ -9,10 +9,21 @@ import me.doggy.justguard.utils.FlagUtils;
 import me.doggy.justguard.flag.FlagValue;
 import ninja.leaping.configurate.ConfigurationNode;
 import org.slf4j.Logger;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.manipulator.immutable.ImmutableColoredData;
+import org.spongepowered.api.data.manipulator.mutable.ColoredData;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.util.Color;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
 import java.util.Optional;
 

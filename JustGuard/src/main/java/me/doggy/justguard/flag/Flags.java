@@ -8,6 +8,7 @@ import me.doggy.justguard.utils.ConfigUtils;
 import me.doggy.justguard.utils.FlagUtils;
 import me.doggy.justguard.utils.MessageUtils;
 import ninja.leaping.configurate.ConfigurationNode;
+import ninja.leaping.configurate.SimpleConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.api.command.CommandResult;
@@ -21,11 +22,14 @@ public class Flags {
 
     private static final ConfigManager configManager = JustGuard.getInstance().getConfigManager();
 
-    private static final String DEFAULT_KEY = "default";
-    private static final String GROUP_PREFIX = "group::";
+    public static final String DEFAULT_KEY = "default";
+    public static final String GROUP_PREFIX = "group::";
 
     private ConfigurationNode root;
 
+    public Flags() {
+        this.root = ConfigurationNode.root();
+    }
     public Flags(ConfigurationNode flagsNode) {
         this.root = flagsNode;
     }

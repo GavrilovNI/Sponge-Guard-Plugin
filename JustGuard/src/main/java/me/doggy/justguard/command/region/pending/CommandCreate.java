@@ -3,6 +3,7 @@ package me.doggy.justguard.command.region.pending;
 import me.doggy.justguard.JustGuard;
 import me.doggy.justguard.config.TextManager;
 import me.doggy.justguard.consts.Texts;
+import me.doggy.justguard.flag.Flags;
 import me.doggy.justguard.utils.MessageUtils;
 import me.doggy.justguard.Pending;
 import ninja.leaping.configurate.ConfigurationNode;
@@ -34,8 +35,7 @@ public class CommandCreate implements CommandExecutor
             return CommandResult.builder().successCount(0).build();
 
         World world = worldOpt.get();
-        ConfigurationNode flags = JustGuard.getInstance().getConfigManager().getDefaultRegionFlags();
-
+        Flags flags = JustGuard.getInstance().getConfigManager().getDefaultRegionFlags();
         Pending.createRegion(src, regionTypeOpt.get(), flags, world);
 
 

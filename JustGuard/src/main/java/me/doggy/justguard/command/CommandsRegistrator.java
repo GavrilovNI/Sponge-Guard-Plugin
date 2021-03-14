@@ -10,6 +10,8 @@ import me.doggy.justguard.command.region.modify.CommandUnsetFlag;
 import me.doggy.justguard.command.region.pending.*;
 import me.doggy.justguard.consts.Permissions;
 import me.doggy.justguard.region.Region;
+import me.doggy.justguard.test.CommandRemoveTestWorld;
+import me.doggy.justguard.test.CommandTestWorld;
 import me.doggy.justguard.utils.help.AABBBuilder;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -161,6 +163,28 @@ public class CommandsRegistrator {
                 .executor(new CommandWand())
                 .build();
 
+
+        CommandSpec cmdTestRemove = CommandSpec.builder()
+                .description(Text.of("No command description"))
+                .permission(Permissions.COMMAND_TEST_REMOVE)
+                .executor(new CommandRemoveTestWorld())
+                .build();
+
+        CommandSpec cmdTest = CommandSpec.builder()
+                .description(Text.of("No command description"))
+                .permission(Permissions.COMMAND_TEST_BASE)
+                .child(cmdTestRemove, "remove")
+                .executor(new CommandTestWorld())
+                .build();
+
+
+
+
+
+
+
+
+
         CommandSpec cmdJustGuard = CommandSpec.builder()
                 .description(Text.of("No command description"))
                 .permission(Permissions.COMMAND_BASE)
@@ -170,6 +194,7 @@ public class CommandsRegistrator {
                 .child(cmdLoad, "load")
                 .child(cmdRegion, "region", "rg")
                 .child(cmdWand, "wand")
+                .child(cmdTest, "test")
                 //.arguments(GenericArguments.string(Text.of("flag")))
                 .executor(new CommandJustGuard())
                 .build();

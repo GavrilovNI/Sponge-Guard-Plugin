@@ -6,8 +6,6 @@ import me.doggy.justguard.config.ConfigManager;
 import me.doggy.justguard.events.EventRegionSelect;
 import me.doggy.justguard.events.player.PlayerEventListener;
 import me.doggy.justguard.region.Region;
-import me.doggy.justguard.utils.RegionUtils;
-import me.doggy.justguard.utils.help.RegionPair;
 import net.luckperms.api.LuckPerms;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
@@ -15,13 +13,12 @@ import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.event.EventManager;
 import org.spongepowered.api.event.game.state.*;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.world.LoadWorldEvent;
 import org.spongepowered.api.event.world.SaveWorldEvent;
 import org.spongepowered.api.plugin.Dependency;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.service.ProviderRegistration;
-import org.spongepowered.api.world.World;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.util.*;
 
@@ -44,9 +41,6 @@ public class JustGuard {
     public static final String PLUGIN_NAME = "JustGuard";
 
     private static JustGuard _instance;
-
-    public static HashMap<String, Region> REGIONS = new HashMap<>();
-    private static List<RegionPair> REGIONS_TO_REMOVE = new ArrayList<>();
 
     @Inject
     @ConfigDir(sharedRoot = false)
@@ -76,9 +70,7 @@ public class JustGuard {
     }
 
     @Listener
-    public void init(GameInitializationEvent event)
-    {
-        loadRegions();
+    public void init(GameInitializationEvent event) {
         registerListeners();
     }
 
@@ -122,75 +114,16 @@ public class JustGuard {
         eventManager.registerListeners(this, new PlayerEventListener());
     }
 
-    public void loadRegions() {
-        logger.debug("Started loading regions");
-        File regionsDir = configManager.getRegionsDir();
-        for (final File fileEntry : regionsDir.listFiles()) {
-            if (fileEntry.isDirectory()) {
-                String worldName = fileEntry.getName();
-                loadRegionByWorld(worldName);
-            }
-        }
-        logger.debug("Finished loading regions");
-    }
-    public void loadRegionByWorld(String worldName) {
-        logger.debug("Started loading regions in world '"+worldName+"'");
-        File worldDir = RegionUtils.getRegionsDirByWorld(worldName);
-        for (final File fileEntry : worldDir.listFiles()) {
-            if (fileEntry.isDirectory()) {
-                RegionPair regionPair = RegionUtils.load(fileEntry);
-                REGIONS.put(regionPair.name, regionPair.region);
-            }
-        }
-        logger.debug("Finished loading regions in world '"+worldName+"'");
-    }
-    public void saveRegionsByWorld(String worldName) {
-        logger.debug("Starting saving regions in world '"+worldName+"'");
-        for(Map.Entry<String, Region> regionEntry : REGIONS.entrySet()) {
-            String name = regionEntry.getKey();
-            Region region = regionEntry.getValue();
 
-            World regionWorld = region.getWorld();
-            if(regionWorld != null && regionWorld.getName().equals(worldName))
-            {
-                RegionUtils.save(new RegionPair(name, region));
-            }
-        }
-        for(RegionPair regionPair : REGIONS_TO_REMOVE) {
-            RegionUtils.removeRegionFromFiles(regionPair.region);
-        }
-        REGIONS_TO_REMOVE.clear();
-        logger.debug("Finished saving regions in world '"+worldName+"'");
-    }
-    public void saveRegions() {
-        logger.debug("Starting saving regions.");
-        for(Map.Entry<String, Region> regionEntry : REGIONS.entrySet()) {
-            String name = regionEntry.getKey();
-            Region region = regionEntry.getValue();
-            RegionUtils.save(new RegionPair(name, region));
-        }
-        for(RegionPair regionPair : REGIONS_TO_REMOVE) {
-            RegionUtils.removeRegionFromFiles(regionPair.region);
-        }
-        REGIONS_TO_REMOVE.clear();
-        logger.debug("Finished saving regions.");
-    }
-
-
-    public boolean removeRegion(String name)
-    {
-        Region region = REGIONS.remove(name);
-        if(region == null)
-            return false;
-        REGIONS_TO_REMOVE.add(new RegionPair(name, region));
-        return false;
-    }
 
 
     @Listener
-    public void onWorldSave(SaveWorldEvent.Pre event)
-    {
-        saveRegionsByWorld(event.getTargetWorld().getName());
+    public void onWorldSave(SaveWorldEvent.Pre event) {
+        RegionsHolder.saveRegionsByWorld(event.getTargetWorld());
+    }
+    @Listener
+    public void onWorldLoad(LoadWorldEvent event) {
+        RegionsHolder.loadRegionsByWorld(event.getTargetWorld());
     }
 
 

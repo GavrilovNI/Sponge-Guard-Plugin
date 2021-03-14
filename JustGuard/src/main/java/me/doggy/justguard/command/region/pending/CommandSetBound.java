@@ -1,6 +1,7 @@
 package me.doggy.justguard.command.region.pending;
 
 import com.flowpowered.math.vector.Vector3d;
+import com.flowpowered.math.vector.Vector3i;
 import me.doggy.justguard.config.TextManager;
 import me.doggy.justguard.consts.Texts;
 import me.doggy.justguard.utils.MessageUtils;
@@ -33,7 +34,7 @@ public class CommandSetBound implements CommandExecutor
 
 
         AABBBuilder.BoundType boundType = boundTypeOpt.get();
-        Vector3d pos = new Vector3d(posXOpt.get(), posYOpt.get(), posZOpt.get());
+        Vector3i pos = new Vector3i(posXOpt.get(), posYOpt.get(), posZOpt.get());
 
         PendingRegion region = Pending.getRegion(src);
 
