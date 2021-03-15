@@ -24,5 +24,11 @@ public class FlagKeys {
     public static final String SEND_COMMAND = "send-command";
     public static final String NOT_TAKE_DAMAGE = "not-take-damage";
     public static final String ATTACK = "attack";
+    public static final String EXIT = "exit";
+    public static final String ENTER = "enter";
+    public static final String WALK = "walk";
+    public static final String TELEPORT = "teleport";
+    public static final String PORTAL = "portal";
+    public static final String BASE = "base";
 
 }

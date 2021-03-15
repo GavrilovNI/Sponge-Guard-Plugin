@@ -1,15 +1,20 @@
 package me.doggy.justguard.events.player;
 
+import co.aikar.timings.Timing;
+import co.aikar.timings.Timings;
+import com.flowpowered.math.GenericMath;
+import com.flowpowered.math.vector.Vector3d;
 import me.doggy.justguard.JustGuard;
+import me.doggy.justguard.RegionsHolder;
 import me.doggy.justguard.config.TextManager;
 import me.doggy.justguard.consts.FlagKeys;
 import me.doggy.justguard.consts.Texts;
 import me.doggy.justguard.flag.FlagPath;
+import me.doggy.justguard.region.Region;
 import me.doggy.justguard.utils.FlagUtils;
 import me.doggy.justguard.utils.InventoryUtils;
 import me.doggy.justguard.utils.MessageUtils;
 import org.slf4j.Logger;
-import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.Transaction;
@@ -18,8 +23,8 @@ import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
+import org.spongepowered.api.entity.vehicle.Boat;
 import org.spongepowered.api.event.Cancellable;
-import org.spongepowered.api.event.Event;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.block.CollideBlockEvent;
@@ -37,13 +42,14 @@ import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.item.inventory.*;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
+import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class PlayerEventListener {
 
@@ -99,14 +105,17 @@ public class PlayerEventListener {
         return result;
     }
 
+    private void sendErrorNoFlagAccess(Player player, FlagPath flagPath) {
+        MessageUtils.SendError(player, Text.of(TextManager.getText(
+                Texts.DONT_HAVE_FLAG_ACCESS,
+                flagPath.getFullPath()
+        )));
+    }
 
     private boolean checkAndCancelIfNeeded(Cancellable event, Player player, Location<World> location, FlagPath flagPath, boolean inverted) {
         logger.info(event.getClass().getSimpleName()+": "+flagPath.getFullPath());
         if(FlagUtils.hasPlayerFlagAccess(player, location, flagPath) == inverted) {
-            MessageUtils.SendError(player, Text.of(TextManager.getText(
-                    Texts.DONT_HAVE_FLAG_ACCESS,
-                    flagPath.getFullPath()
-            )));
+            sendErrorNoFlagAccess(player, flagPath);
             event.setCancelled(true);
             logger.info(event.getClass().getSimpleName()+": "+"cancelled");
             return false;
@@ -238,7 +247,7 @@ public class PlayerEventListener {
         }
     }
 
-    private boolean onPlayerCollideEntity(CollideEntityEvent event, Player player, List<Entity> entities) {
+    private boolean onPlayerCollideEntity(CollideEntityEvent event, Player player, Set<Entity> entities) {
         FlagPath flagPathPrefix = new FlagPath(FlagKeys.ENTITY_COLLIDE);
         for (Entity entity : entities) {
             if(entity.equals(player))
@@ -253,10 +262,15 @@ public class PlayerEventListener {
     @Listener
     public void onPlayerCollideEntityListener(CollideEntityEvent event) {
 
-        List<Entity> entities = event.getEntities();
+        Set<Entity> entities = new HashSet<>(event.getEntities());
         Object source = event.getSource();
         if (source instanceof Entity)
             entities.add((Entity) source);
+        //for (Entity entity : entities)
+        //    entities.addAll(entity.getPassengers());
+
+        if(entities.stream().anyMatch(x->x instanceof Player || x instanceof Boat))
+            logger.info(entities.toString());
 
         for (Entity entity : entities) {
             if(entity instanceof Player) {
@@ -316,6 +330,69 @@ public class PlayerEventListener {
     @Listener
     public void test(HarvestEntityEvent event, @First Player player) {
         logger.info(event.getClass().getSimpleName() + ": " + event.getCause().toString());
+    }
+
+    public boolean canPlayerMove(Player player, Map<String, Region> regionsFrom, Map<String, Region> regionsTo, FlagPath innerFlag) {
+
+        FlagPath flagPath = new FlagPath(FlagKeys.EXIT).add(innerFlag);
+        if(FlagUtils.hasPlayerFlagAccess(player, regionsFrom, flagPath)) {
+            flagPath = new FlagPath(FlagKeys.ENTER).add(innerFlag);
+            if(FlagUtils.hasPlayerFlagAccess(player, regionsTo, flagPath)) {
+                return true;
+            }
+        }
+        sendErrorNoFlagAccess(player, flagPath);
+        return false;
+    }
+
+    public void onEntityMove(MoveEntityEvent event, FlagPath innerFlag) {
+
+        Location<World> fromLocation = event.getFromTransform().getLocation();
+        Location<World> toLocation = event.getToTransform().getLocation();
+
+        Map<String, Region> regionsFrom = RegionsHolder.getRegions(x->x.getValue().contains(fromLocation));
+        Map<String, Region> regionsTo = RegionsHolder.getRegions(x->x.getValue().contains(toLocation));
+
+        Set<String> keysToRemove = new HashSet<>(regionsFrom.keySet());
+        keysToRemove.retainAll(regionsTo.keySet());
+        regionsFrom.keySet().removeAll(keysToRemove);
+        regionsTo.keySet().removeAll(keysToRemove);
+
+        //moving on boats not working properly
+
+        Entity targetEntity = event.getTargetEntity();
+        if(targetEntity instanceof Player) {
+            if(!canPlayerMove((Player) targetEntity, regionsFrom, regionsTo, innerFlag)) {
+                event.setCancelled(true);
+                return;
+            }
+        }
+        List<Entity> passengers = targetEntity.getPassengers();
+        for (Entity passenger : passengers) {
+            if(passenger instanceof Player) {
+                logger.info(passenger.toString());
+                if (!canPlayerMove((Player) passenger, regionsFrom, regionsTo, innerFlag)) {
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+        }
+    }
+
+    @Listener
+    public void onEntityMove(MoveEntityEvent event) {
+
+        FlagPath flagPath = null;
+        if(event instanceof MoveEntityEvent.Teleport) {
+            flagPath = new FlagPath(FlagKeys.TELEPORT);
+            if (event instanceof MoveEntityEvent.Teleport.Portal)
+                flagPath.add(FlagKeys.PORTAL);
+            else
+                flagPath.add(FlagKeys.BASE);
+        } else {
+            flagPath = new FlagPath(FlagKeys.BASE);
+        }
+        onEntityMove(event, flagPath);
     }
 
 
