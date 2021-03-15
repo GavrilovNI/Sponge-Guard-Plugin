@@ -136,7 +136,7 @@ public class FlagPath implements Iterable<String> {
     public static Builder builder() {
         return new Builder();
     }
-    public Builder asBuilder() {
+    public Builder toBuilder() {
         return new Builder(this);
     }
 

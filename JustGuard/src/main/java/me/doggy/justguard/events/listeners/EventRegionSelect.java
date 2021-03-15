@@ -7,7 +7,7 @@ import me.doggy.justguard.config.TextManager;
 import me.doggy.justguard.consts.Texts;
 import me.doggy.justguard.utils.InventoryUtils;
 import me.doggy.justguard.utils.MessageUtils;
-import me.doggy.justguard.utils.help.AABBBuilder;
+import me.doggy.justguard.utils.help.MyAABB;
 import me.doggy.justguard.utils.help.PendingRegion;
 import org.spongepowered.api.data.type.HandType;
 import org.spongepowered.api.entity.living.player.Player;
@@ -16,6 +16,7 @@ import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.util.AABB;
 
 import java.util.Optional;
 
@@ -23,16 +24,16 @@ public class EventRegionSelect {
 
     @Listener
     public void onLeftClick(InteractBlockEvent.Primary event, @First Player player){
-        if(onClick(player, event.getHandType(), AABBBuilder.BoundType.First, event.getTargetBlock().getPosition()))
+        if(onClick(player, event.getHandType(), MyAABB.Builder.BoundType.First, event.getTargetBlock().getPosition()))
             event.setCancelled(true);
     }
     @Listener
     public void onLeftClick(InteractBlockEvent.Secondary event, @First Player player){
-        if(onClick(player, event.getHandType(), AABBBuilder.BoundType.Second, event.getTargetBlock().getPosition()))
+        if(onClick(player, event.getHandType(), MyAABB.Builder.BoundType.Second, event.getTargetBlock().getPosition()))
             event.setCancelled(true);
     }
 
-    private boolean onClick(Player player, HandType handType, AABBBuilder.BoundType boundType, Vector3i position)
+    private boolean onClick(Player player, HandType handType, MyAABB.Builder.BoundType boundType, Vector3i position)
     {
         if(shouldEventCause(player, handType))
         {

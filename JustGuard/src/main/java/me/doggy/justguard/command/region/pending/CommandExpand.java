@@ -5,7 +5,7 @@ import me.doggy.justguard.Pending;
 import me.doggy.justguard.config.TextManager;
 import me.doggy.justguard.consts.Texts;
 import me.doggy.justguard.utils.MessageUtils;
-import me.doggy.justguard.utils.help.AABBBuilder;
+import me.doggy.justguard.utils.help.MyAABB;
 import me.doggy.justguard.utils.help.PendingRegion;
 import org.slf4j.Logger;
 import org.spongepowered.api.command.CommandResult;
@@ -40,7 +40,7 @@ public class CommandExpand implements CommandExecutor
         if(directionOpt.isPresent()) {
 
             Direction direction = directionOpt.get();
-            if(!AABBBuilder.isDirectionAvaliableToExpand(direction)) {
+            if(!MyAABB.Builder.isDirectionAvaliableToExpand(direction)) {
                 MessageUtils.sendError(source, Text.of(TextManager.getText(Texts.ERR_WRONG_DIRECTION_TO_EXPAND)));
                 return CommandResult.success();
 

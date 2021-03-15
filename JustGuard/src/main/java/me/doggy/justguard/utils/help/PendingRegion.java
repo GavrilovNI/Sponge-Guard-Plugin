@@ -13,7 +13,7 @@ public class PendingRegion{
     //public Region.RegionType regionType;
     public Flags flags;
     public World world;
-    public AABBBuilder aabbBuilder = new AABBBuilder();
+    public MyAABB.Builder aabbBuilder = MyAABB.builder();
     public int priority = 0;
 
     public Region build()

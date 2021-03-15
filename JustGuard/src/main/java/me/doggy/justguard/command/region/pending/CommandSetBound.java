@@ -5,7 +5,7 @@ import me.doggy.justguard.config.TextManager;
 import me.doggy.justguard.consts.Texts;
 import me.doggy.justguard.utils.MessageUtils;
 import me.doggy.justguard.Pending;
-import me.doggy.justguard.utils.help.AABBBuilder;
+import me.doggy.justguard.utils.help.MyAABB;
 import me.doggy.justguard.utils.help.PendingRegion;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -20,7 +20,7 @@ public class CommandSetBound implements CommandExecutor
 
     public CommandResult execute(CommandSource src, CommandContext args)
     {
-        Optional<AABBBuilder.BoundType> boundTypeOpt = args.getOne("type");
+        Optional<MyAABB.Builder.BoundType> boundTypeOpt = args.getOne("type");
         Optional<Integer> posXOpt = args.getOne("pos-x");
         Optional<Integer> posYOpt = args.getOne("pos-y");
         Optional<Integer> posZOpt = args.getOne("pos-z");
@@ -32,7 +32,7 @@ public class CommandSetBound implements CommandExecutor
             return CommandResult.builder().successCount(0).build();
 
 
-        AABBBuilder.BoundType boundType = boundTypeOpt.get();
+        MyAABB.Builder.BoundType boundType = boundTypeOpt.get();
         Vector3i pos = new Vector3i(posXOpt.get(), posYOpt.get(), posZOpt.get());
 
         PendingRegion region = Pending.getRegion(src);

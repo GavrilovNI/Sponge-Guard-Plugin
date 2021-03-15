@@ -12,7 +12,7 @@ import me.doggy.justguard.consts.Permissions;
 import me.doggy.justguard.region.Region;
 import me.doggy.justguard.test.CommandRemoveTestWorld;
 import me.doggy.justguard.test.CommandTestWorld;
-import me.doggy.justguard.utils.help.AABBBuilder;
+import me.doggy.justguard.utils.help.MyAABB;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
@@ -38,7 +38,7 @@ public class CommandsRegistrator {
         CommandSpec cmdRegionSetBound = CommandSpec.builder()
                 .description(Text.of("No command description"))
                 .permission(Permissions.COMMAND_REGION_PENDING_SETBOUND)
-                .arguments(GenericArguments.enumValue(Text.of("type"), AABBBuilder.BoundType.class),
+                .arguments(GenericArguments.enumValue(Text.of("type"), MyAABB.Builder.BoundType.class),
                         GenericArguments.integer(Text.of("pos-x")),
                         GenericArguments.integer(Text.of("pos-y")),
                         GenericArguments.integer(Text.of("pos-z")))

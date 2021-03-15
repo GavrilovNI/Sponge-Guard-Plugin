@@ -1,7 +1,6 @@
 package me.doggy.justguard.test;
 
 import com.flowpowered.math.vector.Vector3d;
-import com.flowpowered.math.vector.Vector3i;
 import me.doggy.justguard.JustGuard;
 import me.doggy.justguard.RegionsHolder;
 import me.doggy.justguard.consts.FlagKeys;
@@ -10,19 +9,12 @@ import me.doggy.justguard.flag.FlagValue;
 import me.doggy.justguard.flag.Flags;
 import me.doggy.justguard.region.Region;
 import me.doggy.justguard.utils.FlagUtils;
-import me.doggy.justguard.utils.help.AABBBuilder;
 import me.doggy.justguard.utils.help.MyAABB;
-import ninja.leaping.configurate.ConfigurationNode;
 import org.slf4j.Logger;
-import org.spongepowered.api.GameRegistry;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockTypes;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.manipulator.mutable.ColoredData;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.util.Color;
-import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldArchetype;
