@@ -6,7 +6,6 @@ import me.doggy.justguard.consts.Texts;
 import me.doggy.justguard.flag.Flags;
 import me.doggy.justguard.utils.MessageUtils;
 import me.doggy.justguard.Pending;
-import ninja.leaping.configurate.ConfigurationNode;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -40,7 +39,7 @@ public class CommandCreate implements CommandExecutor
 
 
 
-        MessageUtils.Send(src, Text.of(TextManager.getText(
+        MessageUtils.send(src, Text.of(TextManager.getText(
                 Texts.CMD_ANSWER_REGION_CREATED,
                 world.getName()
         )));

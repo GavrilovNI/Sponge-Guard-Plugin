@@ -1,6 +1,5 @@
 package me.doggy.justguard.command.region.pending;
 
-import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import me.doggy.justguard.config.TextManager;
 import me.doggy.justguard.consts.Texts;
@@ -39,7 +38,7 @@ public class CommandSetBound implements CommandExecutor
         PendingRegion region = Pending.getRegion(src);
 
         if(region == null) {
-            MessageUtils.SendError(src, Text.of(TextManager.getText(Texts.ERR_NO_PENDING_REGION_FOUND)));
+            MessageUtils.sendError(src, Text.of(TextManager.getText(Texts.ERR_NO_PENDING_REGION_FOUND)));
             return CommandResult.success();
         }
         /*else if(!region.regionType.equals(Region.RegionType.Local))
@@ -54,7 +53,7 @@ public class CommandSetBound implements CommandExecutor
             MessageUtils.SendError(src, Text.of(TextManager.getText(Texts.ERR_UNKNOWN)));*/
 
         region.aabbBuilder.set(pos, boundType);
-        MessageUtils.Send(src, Text.of(TextManager.getText(
+        MessageUtils.send(src, Text.of(TextManager.getText(
                 Texts.CMD_ANSWER_BOUND_SETTED,
                 boundType.name().toLowerCase(),
                 pos.toString()

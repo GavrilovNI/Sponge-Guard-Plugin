@@ -3,9 +3,8 @@ package me.doggy.justguard;
 import com.google.inject.Inject;
 import me.doggy.justguard.command.CommandsRegistrator;
 import me.doggy.justguard.config.ConfigManager;
-import me.doggy.justguard.events.EventRegionSelect;
-import me.doggy.justguard.events.player.PlayerEventListener;
-import me.doggy.justguard.region.Region;
+import me.doggy.justguard.events.listeners.EventRegionSelect;
+import me.doggy.justguard.events.listeners.flags.PlayerFlagsEventListener;
 import net.luckperms.api.LuckPerms;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
@@ -17,7 +16,6 @@ import org.spongepowered.api.event.world.LoadWorldEvent;
 import org.spongepowered.api.event.world.SaveWorldEvent;
 import org.spongepowered.api.plugin.Dependency;
 import org.spongepowered.api.plugin.Plugin;
-import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.service.ProviderRegistration;
 
 import java.nio.file.Path;
@@ -112,7 +110,7 @@ public class JustGuard {
         eventManager.registerListeners(this, new EventRegionSelect());
 
         //player listeners
-        eventManager.registerListeners(this, new PlayerEventListener());
+        eventManager.registerListeners(this, new PlayerFlagsEventListener());
     }
 
 

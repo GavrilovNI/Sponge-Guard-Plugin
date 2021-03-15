@@ -12,7 +12,6 @@ import me.doggy.justguard.region.Region;
 import me.doggy.justguard.utils.MathUtils;
 import me.doggy.justguard.utils.MessageUtils;
 import me.doggy.justguard.Pending;
-import me.doggy.justguard.utils.RegionUtils;
 import me.doggy.justguard.utils.help.MyAABB;
 import me.doggy.justguard.utils.help.PendingRegion;
 import net.luckperms.api.LuckPerms;
@@ -27,7 +26,6 @@ import org.spongepowered.api.text.Text;
 
 import java.util.Map;
 import java.util.Optional;
-import java.util.List;
 
 public class CommandClaim implements CommandExecutor
 {
@@ -45,15 +43,15 @@ public class CommandClaim implements CommandExecutor
 
         PendingRegion region = Pending.getRegion(source);
         if(region==null)
-            MessageUtils.SendError(source, Text.of(TextManager.getText(Texts.ERR_NO_PENDING_REGION_FOUND)));
+            MessageUtils.sendError(source, Text.of(TextManager.getText(Texts.ERR_NO_PENDING_REGION_FOUND)));
         else if(RegionsHolder.hasRegion(regionId))
-            MessageUtils.SendError(source, Text.of(TextManager.getText(Texts.ERR_REGION_ALREADY_EXISTS, regionId)));
+            MessageUtils.sendError(source, Text.of(TextManager.getText(Texts.ERR_REGION_ALREADY_EXISTS, regionId)));
         else
         {
             if(hasPermission(source, region))
             {
                 if(Pending.uploadRegion(source, regionId)) {
-                    MessageUtils.Send(source, Text.of(TextManager.getText(Texts.CMD_ANSWER_REGION_CLAIMED, regionId)));
+                    MessageUtils.send(source, Text.of(TextManager.getText(Texts.CMD_ANSWER_REGION_CLAIMED, regionId)));
                     if(source instanceof Player)
                     {
                         Region uploadedRegion = RegionsHolder.getRegion(regionId);
@@ -61,7 +59,7 @@ public class CommandClaim implements CommandExecutor
                     }
                 }
                 else {
-                    MessageUtils.SendError(source, Text.of(TextManager.getText(Texts.ERR_UNKNOWN)));
+                    MessageUtils.sendError(source, Text.of(TextManager.getText(Texts.ERR_UNKNOWN)));
                 }
             }
         }
@@ -87,7 +85,7 @@ public class CommandClaim implements CommandExecutor
                 int regionVolume = (int) Math.ceil(regionSize.getX() * regionSize.getY() * regionSize.getZ());
 
                 if (regionVolume > maxSize) {
-                    MessageUtils.SendError(source, Text.of(TextManager.getText(
+                    MessageUtils.sendError(source, Text.of(TextManager.getText(
                             Texts.MAX_REGION_SIZE_VIOLATION,
                             String.valueOf(regionVolume),
                             String.valueOf(maxSize)
@@ -103,7 +101,7 @@ public class CommandClaim implements CommandExecutor
                 String playerStateStr = regionPair.getValue().getPlayerOwnership(player.getUniqueId()).name().toLowerCase();
                 if(!player.hasPermission(Permissions.CAN_INTERSECT_REGION_WITH_OWNERSHIP_PREFIX + playerStateStr))
                 {
-                    MessageUtils.SendError(source, Text.of(TextManager.getText(
+                    MessageUtils.sendError(source, Text.of(TextManager.getText(
                             Texts.NO_PERMISSION_TO_CLAIM_REGION_INTERSECT_WITH_REGION_OWNERSHIP,
                             regionPair.getKey(),
                             TextManager.getText(playerStateStr)

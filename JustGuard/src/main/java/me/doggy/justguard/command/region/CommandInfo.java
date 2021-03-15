@@ -27,7 +27,7 @@ public class CommandInfo implements CommandExecutor
 
         if(regionIdOpt.isPresent()) {
             if(pageOpt.isPresent()) {
-                MessageUtils.SendError(src, Text.of(Texts.ERR_CMD_TO_MUCH_ARGUMENTS));
+                MessageUtils.sendError(src, Text.of(Texts.ERR_CMD_TO_MUCH_ARGUMENTS));
                 return CommandResult.success();
             }
 
@@ -35,15 +35,15 @@ public class CommandInfo implements CommandExecutor
             Region region = RegionsHolder.getRegion(regionId);
 
             if(region == null) {
-                MessageUtils.SendError(src, Text.of(TextManager.getText(
+                MessageUtils.sendError(src, Text.of(TextManager.getText(
                         Texts.ERR_NO_REGION_FOUND,
                         regionId
                 )));
                 return CommandResult.success();
             }
 
-            MessageUtils.Send(src, Text.of(regionId + ": "));
-            MessageUtils.SendRegionInfo(src, region);
+            MessageUtils.send(src, Text.of(regionId + ": "));
+            MessageUtils.sendRegionInfo(src, region);
 
 
         }
@@ -59,10 +59,10 @@ public class CommandInfo implements CommandExecutor
             Player player = (Player) src;
             Map<String, Region> regions = RegionsHolder.getRegions(x -> x.getValue().contains(player.getLocation()));
 
-            MessageUtils.SendList(src, Arrays.asList(regions.entrySet()), page, pageLength, (key) -> {
+            MessageUtils.sendList(src, Arrays.asList(regions.entrySet()), page, pageLength, (key) -> {
                 Map.Entry<String, Region> regionPair = (Map.Entry<String, Region>) key;
-                MessageUtils.Send(src, Text.of(regionPair.getKey() + ": "));
-                MessageUtils.SendRegionInfo(src, regionPair.getValue());
+                MessageUtils.send(src, Text.of(regionPair.getKey() + ": "));
+                MessageUtils.sendRegionInfo(src, regionPair.getValue());
             });
 
         }

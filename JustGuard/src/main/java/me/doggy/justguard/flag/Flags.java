@@ -13,6 +13,8 @@ import ninja.leaping.configurate.loader.ConfigurationLoader;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.util.Color;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -56,7 +58,7 @@ public class Flags {
 
         if(!innerNode.isVirtual()) {
             if(path.length() == 1) {
-                return getFlag(innerNode, new FlagPath(DEFAULT_KEY), new HashSet<ConfigurationNode>());
+                return getFlag(innerNode, FlagPath.of(DEFAULT_KEY), new HashSet<ConfigurationNode>());
             }
 
             FlagPath innerPath = path.cut(1);

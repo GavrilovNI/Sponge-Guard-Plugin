@@ -1,6 +1,5 @@
 package me.doggy.justguard.command;
 
-import me.doggy.justguard.JustGuard;
 import me.doggy.justguard.RegionsHolder;
 import me.doggy.justguard.config.TextManager;
 import me.doggy.justguard.consts.Texts;
@@ -16,7 +15,7 @@ public class CommandSave implements CommandExecutor
     public CommandResult execute(CommandSource src, CommandContext args)
     {
         RegionsHolder.saveRegions();
-        MessageUtils.Send(src, Text.of(TextManager.getText(Texts.CMD_ANSWER_REGIONS_SAVED)));
+        MessageUtils.send(src, Text.of(TextManager.getText(Texts.CMD_ANSWER_REGIONS_SAVED)));
 
         return CommandResult.success();
     }

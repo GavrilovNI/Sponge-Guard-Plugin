@@ -9,6 +9,7 @@ import me.doggy.justguard.flag.FlagPath;
 import me.doggy.justguard.flag.FlagValue;
 import me.doggy.justguard.flag.Flags;
 import me.doggy.justguard.region.Region;
+import me.doggy.justguard.utils.FlagUtils;
 import me.doggy.justguard.utils.help.AABBBuilder;
 import me.doggy.justguard.utils.help.MyAABB;
 import ninja.leaping.configurate.ConfigurationNode;
@@ -40,6 +41,11 @@ public class TestWorld {
 
     public static Optional<World> getWorld() { return Sponge.getServer().getWorld(worldId); }
 
+    private static FlagPath playerStrangerPrefix = FlagUtils.getPlayerPrefixFlagPath(Region.PlayerOwnership.Stranger);
+    private static List<FlagPath> testFlags = Arrays.asList(
+            FlagPath.of(playerStrangerPrefix, FlagKeys.BLOCK_PLACE),
+            FlagPath.of(playerStrangerPrefix, FlagKeys.BLOCK_BREAK)
+    );
     private static Region createTestRegion(int number, Flags testFlags) {
         World world = getWorld().get();
 
@@ -65,7 +71,18 @@ public class TestWorld {
         RegionsHolder.addRegion(regionName, region);
         return region;
     }
+    private static void createTestRegions() {
+        if(!getWorld().isPresent())
+            return;
 
+        int number = 0;
+        for(FlagPath flagPath : testFlags) {
+            Flags flags = new Flags();
+            flags.setFlag(FlagPath.of(Flags.DEFAULT_KEY), new FlagValue(true));
+            flags.setFlag(flagPath, new FlagValue(false));
+            createTestRegion(number++, flags);
+        }
+    }
 
     public static boolean createWorld() {
         if(getWorld().isPresent())
@@ -95,17 +112,10 @@ public class TestWorld {
             return false;
         }
 
-        boolean savedWorldProperties = Sponge.getServer().saveWorldProperties(properties);
-        Optional<World> loadedWorld = Sponge.getServer().loadWorld(Sponge.getServer().getWorldProperties(worldId).get());
+        Sponge.getServer().saveWorldProperties(properties);
+        Sponge.getServer().loadWorld(Sponge.getServer().getWorldProperties(worldId).get());
 
-        Optional<World> createdWorld = getWorld();
-        if(createdWorld.isPresent()) {
-            int number = 0;
-            Flags flags = new Flags();
-            flags.setFlag(new FlagPath(Flags.DEFAULT_KEY), new FlagValue(true));
-            flags.setFlag(new FlagPath(FlagKeys.PLAYER, Region.PlayerOwnership.Stranger.name().toLowerCase(), FlagKeys.BLOCK_BREAK), new FlagValue(false));
-            createTestRegion(number++, flags);
-        }
+        createTestRegions();
 
         return getWorld().isPresent();
     }

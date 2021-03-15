@@ -1,4 +1,4 @@
-package me.doggy.justguard.events;
+package me.doggy.justguard.events.listeners;
 
 import com.flowpowered.math.vector.Vector3i;
 import me.doggy.justguard.JustGuard;
@@ -42,7 +42,7 @@ public class EventRegionSelect {
             }
             createdRegion.aabbBuilder.set(position, boundType);
 
-            MessageUtils.Send(player, Text.of(TextManager.getText(
+            MessageUtils.send(player, Text.of(TextManager.getText(
                     Texts.CMD_ANSWER_BOUND_SETTED,
                     boundType.name().toLowerCase(),
                     position.toString()

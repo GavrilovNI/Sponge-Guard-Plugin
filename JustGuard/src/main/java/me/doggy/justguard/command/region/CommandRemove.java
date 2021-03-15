@@ -4,7 +4,6 @@ import me.doggy.justguard.RegionsHolder;
 import me.doggy.justguard.command.CommandsRegistrator;
 import me.doggy.justguard.config.TextManager;
 import me.doggy.justguard.consts.Texts;
-import me.doggy.justguard.consts.Permissions;
 import me.doggy.justguard.region.Region;
 import me.doggy.justguard.utils.CommandUtils;
 import me.doggy.justguard.utils.MessageUtils;
@@ -35,7 +34,7 @@ public class CommandRemove implements CommandExecutor
             return CommandResult.success();
 
         RegionsHolder.removeRegion(regionId);
-        MessageUtils.Send(src, Text.of(TextManager.getText(
+        MessageUtils.send(src, Text.of(TextManager.getText(
                 Texts.CMD_ANSWER_REGION_REMOVED,
                 regionId
         )));

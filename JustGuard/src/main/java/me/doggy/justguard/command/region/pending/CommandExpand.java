@@ -31,7 +31,7 @@ public class CommandExpand implements CommandExecutor
 
         PendingRegion region = Pending.getRegion(source);
         if(region==null) {
-            MessageUtils.SendError(source, Text.of(TextManager.getText(Texts.ERR_NO_PENDING_REGION_FOUND)));
+            MessageUtils.sendError(source, Text.of(TextManager.getText(Texts.ERR_NO_PENDING_REGION_FOUND)));
             return CommandResult.success();
         }
 
@@ -41,20 +41,20 @@ public class CommandExpand implements CommandExecutor
 
             Direction direction = directionOpt.get();
             if(!AABBBuilder.isDirectionAvaliableToExpand(direction)) {
-                MessageUtils.SendError(source, Text.of(TextManager.getText(Texts.ERR_WRONG_DIRECTION_TO_EXPAND)));
+                MessageUtils.sendError(source, Text.of(TextManager.getText(Texts.ERR_WRONG_DIRECTION_TO_EXPAND)));
                 return CommandResult.success();
 
             }
 
             region.aabbBuilder.expand(count, direction);
-            MessageUtils.Send(source, Text.of(TextManager.getText(
+            MessageUtils.send(source, Text.of(TextManager.getText(
                     Texts.CMD_ANSWER_BOUNDS_EXPANDED,
                     TextManager.getText(direction.name().toLowerCase()),
                     String.valueOf(count)
             )));
         } else {
             region.aabbBuilder.expand(count);
-            MessageUtils.Send(source, Text.of(TextManager.getText(
+            MessageUtils.send(source, Text.of(TextManager.getText(
                     Texts.CMD_ANSWER_BOUNDS_EXPANDED,
                     TextManager.getText(Texts.DIRECTION_ALL),
                     String.valueOf(count)

@@ -204,22 +204,20 @@ public class RegionsHolder {
             if(regionEntry.getValue().getWorld().equals(world))
                 save(regionEntry.getKey(), regionEntry.getValue());
         }
-        Iterator<Region> i = REGIONS_TO_REMOVE.iterator();
-        while (i.hasNext()) {
-            Region region = i.next();
-            if(region.getWorld().equals(world)) {
-                removeRegionFromFiles(region);
-                i.remove();
-            }
-        }
+
+        List<Region> regionsToRemoveByWorld = new ArrayList<>();
+        REGIONS_TO_REMOVE.forEach(r ->{
+            if(r.getWorld().equals(world))
+                regionsToRemoveByWorld.add(r);
+        });
+        REGIONS_TO_REMOVE.removeAll(regionsToRemoveByWorld);
+        regionsToRemoveByWorld.forEach(r -> removeRegionFromFiles(r));
     }
     public static void saveRegions(){
         for (Map.Entry<String, Region> regionEntry : REGIONS.entrySet()) {
             save(regionEntry.getKey(), regionEntry.getValue());
         }
-        for(Region region : REGIONS_TO_REMOVE) {
-            removeRegionFromFiles(region);
-        }
+        REGIONS_TO_REMOVE.forEach(r -> removeRegionFromFiles(r));
         REGIONS_TO_REMOVE.clear();
     }
 }

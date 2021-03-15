@@ -12,7 +12,7 @@ public class CommandUtils {
 
     public static boolean isRegionFound(CommandSource source, Region region, String regionId) {
         if(region == null) {
-            MessageUtils.SendError(source, Text.of(TextManager.getText(
+            MessageUtils.sendError(source, Text.of(TextManager.getText(
                     Texts.ERR_NO_REGION_FOUND,
                     regionId
             )));
@@ -26,7 +26,7 @@ public class CommandUtils {
             return true;
 
         if(!RegionUtils.canModifyByCommand(region, source)) {
-            MessageUtils.SendError(source, Text.of(TextManager.getText(
+            MessageUtils.sendError(source, Text.of(TextManager.getText(
                     Texts.ERR_NOT_REGION_OWNER,
                     regionId
             )));
@@ -39,7 +39,7 @@ public class CommandUtils {
             return true;
 
         if(!RegionUtils.canModifyByCommand(region, source)) {
-            MessageUtils.SendError(source, Text.of(TextManager.getText(
+            MessageUtils.sendError(source, Text.of(TextManager.getText(
                     Texts.ERR_NOT_REGION_OWNER,
                     regionId
             )));
@@ -50,7 +50,7 @@ public class CommandUtils {
 
     public static boolean isPlayerExecuteCmd(CommandSource source) {
         if (!(source instanceof Player)) {
-            MessageUtils.SendError(source, Text.of(TextManager.getText(Texts.ERR_CMD_ONLY_FOR_PLAYERS)));
+            MessageUtils.sendError(source, Text.of(TextManager.getText(Texts.ERR_CMD_ONLY_FOR_PLAYERS)));
             return false;
         }
         return true;

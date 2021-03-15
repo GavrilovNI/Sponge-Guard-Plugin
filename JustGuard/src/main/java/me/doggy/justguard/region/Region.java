@@ -101,14 +101,17 @@ public class Region<E extends World> implements Identifiable {
     }
 
 
+    private FlagPath getPlayerFlagPath(Player player) {
+        return FlagUtils.getPlayerPrefixFlagPath(getPlayerOwnership(player));
+    }
+
     @NonNull
     public FlagValue getFlag(FlagPath path) {
         return flags.getFlag(path);
     }
     @NonNull
     public FlagValue getPlayerFlag(Player player, FlagPath path) {
-        String playerStateKey = getPlayerOwnership(player.getUniqueId()).name().toLowerCase();
-        return getFlag(new FlagPath(FlagKeys.PLAYER, playerStateKey).add(path));
+        return getFlag(FlagPath.of(getPlayerFlagPath(player), path));
     }
 
     @NonNull
@@ -117,9 +120,7 @@ public class Region<E extends World> implements Identifiable {
     }
     @NonNull
     public FlagValue setPlayerFlag(Player player, FlagPath path, FlagValue value) {
-        String playerStateKey = getPlayerOwnership(player.getUniqueId()).name().toLowerCase();
-        FlagPath newFlagPath = new FlagPath(FlagKeys.PLAYER, playerStateKey).add(path);
-        return setFlag(newFlagPath, value);
+        return setFlag(FlagPath.of(getPlayerFlagPath(player), path), value);
     }
 
 

@@ -8,10 +8,8 @@ import me.doggy.justguard.consts.Texts;
 import me.doggy.justguard.flag.FlagPath;
 import me.doggy.justguard.region.Region;
 import me.doggy.justguard.utils.CommandUtils;
-import me.doggy.justguard.utils.FlagUtils;
 import me.doggy.justguard.utils.MessageUtils;
 import me.doggy.justguard.flag.FlagValue;
-import ninja.leaping.configurate.ConfigurationNode;
 import org.slf4j.Logger;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -43,7 +41,7 @@ public class CommandSetFlag implements CommandExecutor
 
         FlagPath flagPath = FlagPath.parse(flag);
         if(flagPath.isEmpty()) {
-            MessageUtils.SendError(src, Text.of(TextManager.getText(Texts.ERR_CMD_NOT_ENOUGH_ARGUMENTS)));
+            MessageUtils.sendError(src, Text.of(TextManager.getText(Texts.ERR_CMD_NOT_ENOUGH_ARGUMENTS)));
             return CommandResult.success();
         }
         if(!CommandUtils.isRegionFound(src, region, regionId))
@@ -53,7 +51,7 @@ public class CommandSetFlag implements CommandExecutor
 
         FlagValue oldValue = region.setFlag(flagPath, newValue);
 
-        MessageUtils.Send(src, Text.of(TextManager.getText(
+        MessageUtils.send(src, Text.of(TextManager.getText(
                 Texts.CMD_ANSWER_FLAG_CHANGED,
                 regionId,
                 flagPath.getFullPath(),

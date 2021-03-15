@@ -2,7 +2,6 @@ package me.doggy.justguard.test;
 
 import me.doggy.justguard.JustGuard;
 import me.doggy.justguard.config.ConfigManager;
-import me.doggy.justguard.utils.CommandUtils;
 import me.doggy.justguard.utils.MessageUtils;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
@@ -22,10 +21,16 @@ public class CommandTestWorld implements CommandExecutor
 
     public CommandResult execute(CommandSource src, CommandContext args) {
 
-
-
-        TestWorld.createWorld();
-
+        if(!TestWorld.getWorld().isPresent()) {
+            if(TestWorld.createWorld()) {
+                MessageUtils.send(src, Text.of("Test world created."));
+            } else {
+                MessageUtils.sendError(src, Text.of("Test world not created!"));
+                return CommandResult.success();
+            }
+        } else {
+            MessageUtils.send(src, Text.of("Test world already created."));
+        }
 
         if(!(src instanceof Player))
             return CommandResult.success();
@@ -40,10 +45,7 @@ public class CommandTestWorld implements CommandExecutor
             }
 
             player.setLocation(tpLoc);
-            MessageUtils.SendError(player, Text.of("Teleporting..."));
-        }
-        else {
-            MessageUtils.SendError(src, Text.of("World is not created yet."));
+            MessageUtils.send(player, Text.of("Teleporting..."));
         }
 
         return CommandResult.success();

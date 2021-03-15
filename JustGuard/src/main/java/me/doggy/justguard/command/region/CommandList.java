@@ -38,7 +38,7 @@ public class CommandList implements CommandExecutor
             regions = RegionsHolder.getRegions();
         }
 
-        MessageUtils.SendList(src, Arrays.asList(regions.entrySet().toArray()), page, pageLength, (key) -> {
+        MessageUtils.sendList(src, Arrays.asList(regions.entrySet().toArray()), page, pageLength, (key) -> {
             return Text.of(((Map.Entry<String, Region>)key).getKey());
         });
 
