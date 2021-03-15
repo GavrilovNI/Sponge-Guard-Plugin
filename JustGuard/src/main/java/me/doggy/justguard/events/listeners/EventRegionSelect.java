@@ -5,10 +5,10 @@ import me.doggy.justguard.JustGuard;
 import me.doggy.justguard.Pending;
 import me.doggy.justguard.config.TextManager;
 import me.doggy.justguard.consts.Texts;
+import me.doggy.justguard.region.Region;
 import me.doggy.justguard.utils.InventoryUtils;
 import me.doggy.justguard.utils.MessageUtils;
 import me.doggy.justguard.utils.help.MyAABB;
-import me.doggy.justguard.utils.help.PendingRegion;
 import org.spongepowered.api.data.type.HandType;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
@@ -16,7 +16,6 @@ import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.util.AABB;
 
 import java.util.Optional;
 
@@ -37,11 +36,11 @@ public class EventRegionSelect {
     {
         if(shouldEventCause(player, handType))
         {
-            PendingRegion createdRegion = Pending.getRegion(player);
+            Region.Builder createdRegion = Pending.getRegion(player);
             if(createdRegion == null) {
                 createdRegion = Pending.createRegion(player, Pending.RegionType.Local, JustGuard.getInstance().getConfigManager().getDefaultRegionFlags(), player.getWorld());
             }
-            createdRegion.aabbBuilder.set(position, boundType);
+            createdRegion.getAABBBuilder().set(position, boundType);
 
             MessageUtils.send(player, Text.of(TextManager.getText(
                     Texts.CMD_ANSWER_BOUND_SETTED,

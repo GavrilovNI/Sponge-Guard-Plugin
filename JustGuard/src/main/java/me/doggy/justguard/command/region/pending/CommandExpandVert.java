@@ -4,8 +4,8 @@ import me.doggy.justguard.JustGuard;
 import me.doggy.justguard.Pending;
 import me.doggy.justguard.config.TextManager;
 import me.doggy.justguard.consts.Texts;
+import me.doggy.justguard.region.Region;
 import me.doggy.justguard.utils.MessageUtils;
-import me.doggy.justguard.utils.help.PendingRegion;
 import org.slf4j.Logger;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -19,13 +19,13 @@ public class CommandExpandVert implements CommandExecutor
 
     public CommandResult execute(CommandSource source, CommandContext args)
     {
-        PendingRegion region = Pending.getRegion(source);
-        if(region==null) {
+        Region.Builder regionBuilder = Pending.getRegion(source);
+        if(regionBuilder==null) {
             MessageUtils.sendError(source, Text.of(TextManager.getText(Texts.ERR_NO_PENDING_REGION_FOUND)));
             return CommandResult.success();
         }
 
-        region.aabbBuilder.expandVert();
+        regionBuilder.getAABBBuilder().expandVert();
         MessageUtils.send(source, Text.of(TextManager.getText(Texts.CMD_ANSWER_BOUNDS_EXPANDED_VERT)));
 
         return CommandResult.success();

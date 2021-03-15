@@ -9,6 +9,7 @@ import me.doggy.justguard.utils.help.MyAABB;
 import me.doggy.justguard.flag.FlagValue;
 import ninja.leaping.configurate.ConfigurationNode;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.util.Identifiable;
 import org.spongepowered.api.world.Location;
@@ -123,6 +124,51 @@ public class Region<E extends World> implements Identifiable {
         return setFlag(FlagPath.of(getPlayerFlagPath(player), path), value);
     }
 
+    public static class Builder {
+        private Flags flags;
+        private World world;
+        private MyAABB.Builder aabbBuilder = MyAABB.builder();
+        private int priority = 0;
+
+        private Builder() {}
+
+        public Builder setWorld(World world) {
+            this.world = world;
+            return this;
+        }
+        public Builder setFlags(Flags flags) {
+            this.flags = flags;
+            return this;
+        }
+        public Builder setPriority(int priority) {
+            this.priority = priority;
+            return this;
+        }
+        @Nullable
+        public Flags getFlags() {
+            return flags;
+        }
+        @Nullable
+        public World getWorld() {
+            return world;
+        }
+        public MyAABB.Builder getAABBBuilder() {
+            return aabbBuilder;
+        }
+        public int getPriority() {
+            return priority;
+        }
+
+        public Region build() {
+            Region result = new Region(world, aabbBuilder.build(), flags);
+            result.setPriority(priority);
+            return result;
+        }
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
 
 
 }

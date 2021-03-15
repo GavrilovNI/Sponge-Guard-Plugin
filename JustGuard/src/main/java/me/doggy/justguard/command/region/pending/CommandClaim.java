@@ -13,7 +13,6 @@ import me.doggy.justguard.utils.MathUtils;
 import me.doggy.justguard.utils.MessageUtils;
 import me.doggy.justguard.Pending;
 import me.doggy.justguard.utils.help.MyAABB;
-import me.doggy.justguard.utils.help.PendingRegion;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.model.user.User;
 import org.slf4j.Logger;
@@ -41,14 +40,14 @@ public class CommandClaim implements CommandExecutor
         String regionId = regionIdOpt.get();
 
 
-        PendingRegion region = Pending.getRegion(source);
-        if(region==null)
+        Region.Builder regionBuilder = Pending.getRegion(source);
+        if(regionBuilder==null)
             MessageUtils.sendError(source, Text.of(TextManager.getText(Texts.ERR_NO_PENDING_REGION_FOUND)));
         else if(RegionsHolder.hasRegion(regionId))
             MessageUtils.sendError(source, Text.of(TextManager.getText(Texts.ERR_REGION_ALREADY_EXISTS, regionId)));
         else
         {
-            if(hasPermission(source, region))
+            if(hasPermission(source, regionBuilder))
             {
                 if(Pending.uploadRegion(source, regionId)) {
                     MessageUtils.send(source, Text.of(TextManager.getText(Texts.CMD_ANSWER_REGION_CLAIMED, regionId)));
@@ -67,13 +66,13 @@ public class CommandClaim implements CommandExecutor
         return CommandResult.success();
     }
 
-    private boolean hasPermission(CommandSource source, PendingRegion region)
+    private boolean hasPermission(CommandSource source, Region.Builder regionBuilder)
     {
         if(source instanceof Player)
         {
             Player player = (Player) source;
 
-            MyAABB regionAABB = region.aabbBuilder.build();
+            MyAABB regionAABB = regionBuilder.getAABBBuilder().build();
 
             if(!player.hasPermission(Permissions.REGION_CLAIM_INFINITE_SIZE)) {
 
@@ -94,7 +93,7 @@ public class CommandClaim implements CommandExecutor
                 }
             }
 
-            Map<String, Region> intersectRegions = RegionsHolder.getRegions(x -> x.getValue().intersects(region.world, regionAABB));
+            Map<String, Region> intersectRegions = RegionsHolder.getRegions(x -> x.getValue().intersects(regionBuilder.getWorld(), regionAABB));
             for (Map.Entry<String, Region> regionPair : intersectRegions.entrySet())
             {
                 //intersect with, check for ownership

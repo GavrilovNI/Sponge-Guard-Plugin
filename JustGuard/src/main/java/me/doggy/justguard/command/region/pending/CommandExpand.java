@@ -4,9 +4,9 @@ import me.doggy.justguard.JustGuard;
 import me.doggy.justguard.Pending;
 import me.doggy.justguard.config.TextManager;
 import me.doggy.justguard.consts.Texts;
+import me.doggy.justguard.region.Region;
 import me.doggy.justguard.utils.MessageUtils;
 import me.doggy.justguard.utils.help.MyAABB;
-import me.doggy.justguard.utils.help.PendingRegion;
 import org.slf4j.Logger;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -29,8 +29,8 @@ public class CommandExpand implements CommandExecutor
             return CommandResult.builder().successCount(0).build();
         }
 
-        PendingRegion region = Pending.getRegion(source);
-        if(region==null) {
+        Region.Builder regionBuilder = Pending.getRegion(source);
+        if(regionBuilder==null) {
             MessageUtils.sendError(source, Text.of(TextManager.getText(Texts.ERR_NO_PENDING_REGION_FOUND)));
             return CommandResult.success();
         }
@@ -46,14 +46,14 @@ public class CommandExpand implements CommandExecutor
 
             }
 
-            region.aabbBuilder.expand(count, direction);
+            regionBuilder.getAABBBuilder().expand(count, direction);
             MessageUtils.send(source, Text.of(TextManager.getText(
                     Texts.CMD_ANSWER_BOUNDS_EXPANDED,
                     TextManager.getText(direction.name().toLowerCase()),
                     String.valueOf(count)
             )));
         } else {
-            region.aabbBuilder.expand(count);
+            regionBuilder.getAABBBuilder().expand(count);
             MessageUtils.send(source, Text.of(TextManager.getText(
                     Texts.CMD_ANSWER_BOUNDS_EXPANDED,
                     TextManager.getText(Texts.DIRECTION_ALL),

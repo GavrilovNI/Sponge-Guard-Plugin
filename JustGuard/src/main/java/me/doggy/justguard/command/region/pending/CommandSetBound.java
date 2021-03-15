@@ -3,10 +3,10 @@ package me.doggy.justguard.command.region.pending;
 import com.flowpowered.math.vector.Vector3i;
 import me.doggy.justguard.config.TextManager;
 import me.doggy.justguard.consts.Texts;
+import me.doggy.justguard.region.Region;
 import me.doggy.justguard.utils.MessageUtils;
 import me.doggy.justguard.Pending;
 import me.doggy.justguard.utils.help.MyAABB;
-import me.doggy.justguard.utils.help.PendingRegion;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
@@ -35,24 +35,14 @@ public class CommandSetBound implements CommandExecutor
         MyAABB.Builder.BoundType boundType = boundTypeOpt.get();
         Vector3i pos = new Vector3i(posXOpt.get(), posYOpt.get(), posZOpt.get());
 
-        PendingRegion region = Pending.getRegion(src);
+        Region.Builder regionBuilder = Pending.getRegion(src);
 
-        if(region == null) {
+        if(regionBuilder == null) {
             MessageUtils.sendError(src, Text.of(TextManager.getText(Texts.ERR_NO_PENDING_REGION_FOUND)));
             return CommandResult.success();
         }
-        /*else if(!region.regionType.equals(Region.RegionType.Local))
-            MessageUtils.SendError(src, Text.of(TextManager.getText(Texts.ERR_SETBOUND_ONLY_FOR_LOCAL_REGIONS)));*/
-        /*else if(region.aabbBuilder.set(pos, boundType))
-            MessageUtils.Send(src, Text.of(TextManager.getText(
-                    Texts.CMD_ANSWER_BOUND_SETTED,
-                    boundType.name().toLowerCase(),
-                    pos.toString()
-            )));
-        else
-            MessageUtils.SendError(src, Text.of(TextManager.getText(Texts.ERR_UNKNOWN)));*/
 
-        region.aabbBuilder.set(pos, boundType);
+        regionBuilder.getAABBBuilder().set(pos, boundType);
         MessageUtils.send(src, Text.of(TextManager.getText(
                 Texts.CMD_ANSWER_BOUND_SETTED,
                 boundType.name().toLowerCase(),

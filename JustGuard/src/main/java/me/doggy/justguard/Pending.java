@@ -1,13 +1,9 @@
 package me.doggy.justguard;
 
-import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import me.doggy.justguard.flag.Flags;
 import me.doggy.justguard.region.Region;
-import me.doggy.justguard.utils.help.PendingRegion;
-import ninja.leaping.configurate.ConfigurationNode;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.world.World;
 
 import java.util.HashMap;
@@ -22,24 +18,21 @@ public class Pending {
         Local
     }
 
-    private static HashMap<CommandSource, PendingRegion> regions = new HashMap<>();
+    private static HashMap<CommandSource, Region.Builder> regions = new HashMap<>();
 
-    public static PendingRegion getRegion(CommandSource source)
+    public static Region.Builder getRegion(CommandSource source)
     {
         return regions.get(source);
     }
 
-    public static PendingRegion createRegion(CommandSource source, RegionType regionType, Flags flags, World world)
+    public static Region.Builder createRegion(CommandSource source, RegionType regionType, Flags flags, World world)
     {
-        PendingRegion pendingRegion = new PendingRegion();
-        pendingRegion.flags = flags;
-        pendingRegion.world = world;
-
+        Region.Builder pendingRegion = Region.builder().setFlags(flags).setWorld(world);
         if(regionType.equals(RegionType.Global))
         {
-            pendingRegion.aabbBuilder.setFirstBlock(new Vector3i(Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE));
-            pendingRegion.aabbBuilder.setSecondBlock(new Vector3i(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE));
-            pendingRegion.priority = Integer.MIN_VALUE;
+            pendingRegion.setPriority(Integer.MIN_VALUE).getAABBBuilder()
+                    .setFirstBlock(new Vector3i(Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE))
+                    .setSecondBlock(new Vector3i(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE));
         }
 
         regions.put(source, pendingRegion);
@@ -53,7 +46,7 @@ public class Pending {
 
     public static boolean uploadRegion(CommandSource source, String name)
     {
-        PendingRegion pendingRegion = regions.get(source);
+        Region.Builder pendingRegion = regions.get(source);
         if(pendingRegion == null)
             return false;
 
