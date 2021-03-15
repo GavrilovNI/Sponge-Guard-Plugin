@@ -11,6 +11,7 @@ import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.util.rotation.Rotation;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -41,7 +42,7 @@ public class CommandTestWorld implements CommandExecutor
             if(player.getWorld().equals(TestWorld.getWorld().get())) {
                 tpLoc = Sponge.getServer().getWorld(Sponge.getServer().getDefaultWorldName()).get().getSpawnLocation().add(0,10,0);
             } else {
-                tpLoc = new Location<World>(TestWorld.getWorld().get(), 0, 255,0);
+                tpLoc = new Location<World>(TestWorld.getWorld().get(), TestWorld.ISLANDS_SIZE / 2, TestWorld.ISLANDS_HEIGHT+1,TestWorld.ISLANDS_SIZE / 2);
             }
 
             player.setLocation(tpLoc);

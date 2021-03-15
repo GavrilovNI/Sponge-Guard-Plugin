@@ -22,6 +22,7 @@ import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.mutable.ColoredData;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.util.Color;
+import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldArchetype;
@@ -38,6 +39,8 @@ public class TestWorld {
 
     private static final Logger logger = JustGuard.getInstance().getLogger();
     private static final String worldId = JustGuard.PLUGIN_ID+".test-world";
+    public static final int ISLANDS_HEIGHT = 100;
+    public static final int ISLANDS_SIZE = 8;
 
     public static Optional<World> getWorld() { return Sponge.getServer().getWorld(worldId); }
 
@@ -51,16 +54,17 @@ public class TestWorld {
 
         BlockState blockState = (number % 2 == 0 ? BlockTypes.STONE : BlockTypes.COAL_BLOCK).getDefaultState();
 
-        final int regionSize = 8;
-        for(int x = 0; x < regionSize; x++) {
-            for(int y = 0; y < regionSize; y++) {
-                Location<World> location = world.getLocation(x, 100, y).add(number*regionSize,0,0);
+        Vector3d startPosition = new Vector3d(1, 0, 0).mul(number * ISLANDS_SIZE);
+        Vector3d endPosition = startPosition.add(ISLANDS_SIZE, 256, ISLANDS_SIZE);
+        MyAABB bounds = new MyAABB(startPosition, endPosition);
+
+        for(int x = 0; x < ISLANDS_SIZE; x++) {
+            for(int y = 0; y < ISLANDS_SIZE; y++) {
+                Location<World> location = new Location<World>(getWorld().get(), startPosition.add(x, ISLANDS_HEIGHT, y));
                 location.setBlock(blockState);
             }
         }
 
-        MyAABB bounds = new MyAABB(new Vector3d(number*regionSize, 0, 0),
-                                    new Vector3d((number+1)*regionSize, 256, regionSize));
 
         Region region = new Region(world, bounds, testFlags);
 
