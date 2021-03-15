@@ -43,13 +43,12 @@ public class RegionsHolder {
         return true;
     }
     public static void removeRegionsByWorld(World world) {
-        Iterator<Map.Entry<String, Region>> i = REGIONS.entrySet().iterator();
-        while (i.hasNext()) {
-            Map.Entry<String, Region> regionEntry = i.next();
-            if(regionEntry.getValue().getWorld().equals(world)) {
-                removeRegion(regionEntry.getKey());
-            }
+        Map<String, Region> newRegionNamesToRemove = new HashMap<>();
+        for (Map.Entry<String, Region> regionEntry : REGIONS.entrySet()) {
+            newRegionNamesToRemove.put(regionEntry.getKey(), regionEntry.getValue());
         }
+        REGIONS_TO_REMOVE.addAll(newRegionNamesToRemove.values());
+        REGIONS.keySet().removeAll(newRegionNamesToRemove.keySet());
     }
     public static boolean hasRegion(String regionName) {
         return REGIONS.containsKey(regionName);

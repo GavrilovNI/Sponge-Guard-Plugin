@@ -16,6 +16,7 @@ import org.spongepowered.api.event.world.LoadWorldEvent;
 import org.spongepowered.api.event.world.SaveWorldEvent;
 import org.spongepowered.api.plugin.Dependency;
 import org.spongepowered.api.plugin.Plugin;
+import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.service.ProviderRegistration;
 
 import java.nio.file.Path;
@@ -46,11 +47,14 @@ public class JustGuard {
     private Path configDir;
     @Inject
     private Logger logger;
+    @Inject
+    private PluginContainer pluginContainer;
 
     private ConfigManager configManager;
     private LuckPerms luckPerms;
 
     public static JustGuard getInstance() { return _instance; }
+    public PluginContainer getPluginContainer() { return pluginContainer; }
     public Logger getLogger() { return logger; }
     public ConfigManager getConfigManager() { return configManager; }
     public LuckPerms getLuckPerms() { return luckPerms; }

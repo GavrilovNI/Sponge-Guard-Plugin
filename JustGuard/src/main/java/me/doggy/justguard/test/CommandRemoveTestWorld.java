@@ -17,10 +17,14 @@ public class CommandRemoveTestWorld implements CommandExecutor
 
     public CommandResult execute(CommandSource src, CommandContext args) {
 
-        if(TestWorld.removeWorld())
-            MessageUtils.send(src, Text.of("Test world removed."));
-        else
-            MessageUtils.sendError(src, Text.of("Test world not removed."));
+        if(TestWorld.getWorld().isPresent()) {
+            if (TestWorld.removeWorld())
+                MessageUtils.send(src, Text.of("Test world removed."));
+            else
+                MessageUtils.sendError(src, Text.of("Test world not removed."));
+        } else {
+            MessageUtils.sendError(src, Text.of("Test world already removed."));
+        }
         return CommandResult.success();
     }
 }

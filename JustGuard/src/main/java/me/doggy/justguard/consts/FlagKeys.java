@@ -31,4 +31,7 @@ public class FlagKeys {
     public static final String PORTAL = "portal";
     public static final String BASE = "base";
 
+
+    public static final String MESSAGES = "messages";
+
 }

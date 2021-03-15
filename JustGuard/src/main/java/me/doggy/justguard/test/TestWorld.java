@@ -75,11 +75,14 @@ public class TestWorld {
         if(!getWorld().isPresent())
             return;
 
+        FlagPath textEnterPath = FlagPath.of(FlagKeys.MESSAGES, FlagKeys.ENTER);
         int number = 0;
         for(FlagPath flagPath : testFlags) {
             Flags flags = new Flags();
             flags.setFlag(FlagPath.of(Flags.DEFAULT_KEY), new FlagValue(true));
             flags.setFlag(flagPath, new FlagValue(false));
+            flags.setFlag(textEnterPath, new FlagValue("Testing: '"+flagPath.getFullPath()+"'"));
+
             createTestRegion(number++, flags);
         }
     }

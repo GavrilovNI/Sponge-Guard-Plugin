@@ -3,12 +3,17 @@ package me.doggy.justguard.events.listeners.flags;
 import me.doggy.justguard.JustGuard;
 import me.doggy.justguard.RegionsHolder;
 import me.doggy.justguard.consts.FlagKeys;
+import me.doggy.justguard.events.PlayerEnterRegionEvent;
+import me.doggy.justguard.events.PlayerExitRegionEvent;
 import me.doggy.justguard.flag.FlagPath;
+import me.doggy.justguard.flag.FlagValue;
+import me.doggy.justguard.flag.Flags;
 import me.doggy.justguard.region.Region;
 import me.doggy.justguard.utils.FlagUtils;
 import me.doggy.justguard.utils.InventoryUtils;
 import me.doggy.justguard.utils.MessageUtils;
 import org.slf4j.Logger;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.Transaction;
@@ -23,6 +28,7 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.block.CollideBlockEvent;
 import org.spongepowered.api.event.block.InteractBlockEvent;
+import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.EventContext;
 import org.spongepowered.api.event.cause.EventContextKeys;
 import org.spongepowered.api.event.cause.entity.damage.DamageType;
@@ -36,6 +42,8 @@ import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.item.inventory.*;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
+import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -302,12 +310,30 @@ public class PlayerFlagsEventListener {
     // MOVING
     //
     public boolean canPlayerMove(Player player, Map<String, Region> regionsFrom, Map<String, Region> regionsTo, FlagPath innerFlag) {
-
         FlagPath flagPath = FlagPath.of(FlagKeys.EXIT, innerFlag);
+
         if(FlagUtils.hasPlayerFlagAccess(player, regionsFrom, flagPath)) {
             flagPath = FlagPath.of(FlagKeys.ENTER, innerFlag);
+
             if(FlagUtils.hasPlayerFlagAccess(player, regionsTo, flagPath)) {
-                return true;
+
+                boolean canceled = false;
+                for (Map.Entry<String, Region> regionEntry : regionsTo.entrySet()) {
+                    PlayerEnterRegionEvent event = new PlayerEnterRegionEvent(player, regionEntry.getValue());
+                    event.setCancelled(canceled);
+                    Sponge.getEventManager().post(event);
+                    if(event.isCancelled())
+                        canceled = true;
+                }
+                for (Map.Entry<String, Region> regionEntry : regionsFrom.entrySet()) {
+                    PlayerExitRegionEvent event = new PlayerExitRegionEvent(player, regionEntry.getValue());
+                    event.setCancelled(canceled);
+                    Sponge.getEventManager().post(event);
+                    if(event.isCancelled())
+                        canceled = true;
+                }
+
+                return !canceled;
             }
         }
         MessageUtils.sendErrorNoFlagAccess(player, flagPath);
@@ -362,6 +388,23 @@ public class PlayerFlagsEventListener {
             flagPath = FlagPath.of(FlagKeys.BASE);
         }
         onEntityMove(event, flagPath);
+    }
+
+    @Listener
+    public void onPlayerEnterRegion(PlayerEnterRegionEvent event) {
+        logger.info(event.getClass().getSimpleName()+": "+event.getCause());
+        FlagPath textEnterPath = FlagPath.of(FlagKeys.MESSAGES, FlagKeys.ENTER);
+        FlagValue enterMessage = event.getRegion().getFlag(textEnterPath);
+        if(!enterMessage.isEmpty())
+            MessageUtils.send(event.getTargetEntity(), Text.of(enterMessage.getString("")));
+    }
+    @Listener
+    public void onPlayerExitRegion(PlayerExitRegionEvent event) {
+        logger.info(event.getClass().getSimpleName()+": "+event.getCause());
+        FlagPath textEnterPath = FlagPath.of(FlagKeys.MESSAGES, FlagKeys.EXIT);
+        FlagValue enterMessage = event.getRegion().getFlag(textEnterPath);
+        if(!enterMessage.isEmpty())
+            MessageUtils.send(event.getTargetEntity(), Text.of(enterMessage.getString("")));
     }
 
 
