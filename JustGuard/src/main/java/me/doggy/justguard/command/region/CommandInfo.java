@@ -59,7 +59,7 @@ public class CommandInfo implements CommandExecutor
             Player player = (Player) src;
             Map<String, Region> regions = RegionsHolder.getRegions(x -> x.getValue().contains(player.getLocation()));
 
-            MessageUtils.sendList(src, Arrays.asList(regions.entrySet()), page, pageLength, (key) -> {
+            MessageUtils.sendList(src, new ArrayList<>(regions.entrySet()), page, pageLength, (key) -> {
                 Map.Entry<String, Region> regionPair = (Map.Entry<String, Region>) key;
                 MessageUtils.send(src, Text.of(regionPair.getKey() + ": "));
                 MessageUtils.sendRegionInfo(src, regionPair.getValue());

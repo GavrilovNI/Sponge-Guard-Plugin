@@ -110,8 +110,8 @@ public class PlayerFlagsEventListener {
             return false;
         return handleEvent(event, player, locationOpt.get(), flagPath);
     }
-    private boolean handleEvent(Cancellable event, Player player, Location<World> location, FlagPath flagPath, boolean inverted) {
-        if(FlagUtils.hasPlayerFlagAccess(player, location, flagPath) == inverted) {
+    private boolean handleEvent(Cancellable event, Player player, Location<World> location, FlagPath flagPath, boolean valueFlagAccess) {
+        if(FlagUtils.hasPlayerFlagAccess(player, location, flagPath) != valueFlagAccess) {
             event.setCancelled(true);
             MessageUtils.sendErrorNoFlagAccess(player, flagPath);
             return true;
@@ -413,7 +413,12 @@ public class PlayerFlagsEventListener {
     //
     @Listener
     public void onPlayerSendCommand(SendCommandEvent event, @First Player player) {
-        String command = event.getCommand()+FlagPath.FLAG_SPLITTER+event.getArguments().replace(" ",FlagPath.FLAG_SPLITTER);
+
+        String flagSplitter = ".";
+        String args = event.getArguments().replace(" ", flagSplitter);
+        String command = event.getCommand();
+        if(args.length() != 0)
+            command += flagSplitter+args;
         FlagPath flagPath = FlagPath.of(FlagKeys.SEND_COMMAND, command);
         handleEvent(event, player, player.getLocation(), flagPath);
     }

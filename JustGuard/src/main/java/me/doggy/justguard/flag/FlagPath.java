@@ -14,7 +14,6 @@ import java.util.*;
 
 public class FlagPath implements Iterable<String> {
 
-    public static final String FLAG_SPLITTER = "\\.";
     private List<String> path;
 
     private FlagPath() { this.path = new ArrayList<>(); }
@@ -22,7 +21,7 @@ public class FlagPath implements Iterable<String> {
     private FlagPath(String ... path) { this.path = Arrays.asList(path); }
 
     public static FlagPath parse(String str) {
-        return new FlagPath(Arrays.asList(str.split(FLAG_SPLITTER)));
+        return new FlagPath(Arrays.asList(str.split("\\.")));
     }
 
 

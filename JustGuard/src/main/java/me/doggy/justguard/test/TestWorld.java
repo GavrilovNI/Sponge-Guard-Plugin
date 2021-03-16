@@ -1,6 +1,7 @@
 package me.doggy.justguard.test;
 
 import com.flowpowered.math.vector.Vector3d;
+import javafx.util.Pair;
 import me.doggy.justguard.JustGuard;
 import me.doggy.justguard.RegionsHolder;
 import me.doggy.justguard.consts.FlagKeys;
@@ -25,6 +26,7 @@ import org.spongepowered.api.world.storage.WorldProperties;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class TestWorld {
@@ -37,9 +39,25 @@ public class TestWorld {
     public static Optional<World> getWorld() { return Sponge.getServer().getWorld(worldId); }
 
     private static FlagPath playerStrangerPrefix = FlagUtils.getPlayerPrefixFlagPath(Region.PlayerOwnership.Stranger);
-    private static List<FlagPath> testFlags = Arrays.asList(
-            FlagPath.of(playerStrangerPrefix, FlagKeys.BLOCK_PLACE),
-            FlagPath.of(playerStrangerPrefix, FlagKeys.BLOCK_BREAK)
+    private static List<Pair<FlagPath, FlagValue>> testFlags = Arrays.asList(
+            new Pair(FlagPath.of(playerStrangerPrefix, FlagKeys.BLOCK_INTERACT), new FlagValue(false)),
+            new Pair(FlagPath.of(playerStrangerPrefix, FlagKeys.BLOCK_PLACE), new FlagValue(false)),
+            new Pair(FlagPath.of(playerStrangerPrefix, FlagKeys.BLOCK_BREAK), new FlagValue(false)),
+            new Pair(FlagPath.of(playerStrangerPrefix, FlagKeys.BLOCK_COLLIDE), new FlagValue(false)),
+            new Pair(FlagPath.of(playerStrangerPrefix, FlagKeys.INVENTORY_INTERACT), new FlagValue(false)),
+            new Pair(FlagPath.of(playerStrangerPrefix, FlagKeys.ENTITY_INTERACT), new FlagValue(false)),
+            new Pair(FlagPath.of(playerStrangerPrefix, FlagKeys.ENTITY_SPAWN), new FlagValue(false)),
+            new Pair(FlagPath.of(playerStrangerPrefix, FlagKeys.ENTITY_ATTACK), new FlagValue(false)),
+            new Pair(FlagPath.of(playerStrangerPrefix, FlagKeys.ENTITY_COLLIDE), new FlagValue(false)),
+            new Pair(FlagPath.of(playerStrangerPrefix, FlagKeys.ITEM_INTERACT), new FlagValue(false)),
+            new Pair(FlagPath.of(playerStrangerPrefix, FlagKeys.ITEM_USE), new FlagValue(false)),
+            new Pair(FlagPath.of(playerStrangerPrefix, FlagKeys.ITEM_DROP), new FlagValue(false)),
+            new Pair(FlagPath.of(playerStrangerPrefix, FlagKeys.ITEM_PICKUP), new FlagValue(false)),
+            new Pair(FlagPath.of(playerStrangerPrefix, FlagKeys.NOT_TAKE_DAMAGE), new FlagValue(true)),
+            new Pair(FlagPath.of(playerStrangerPrefix, FlagKeys.ATTACK), new FlagValue(false)),
+            new Pair(FlagPath.of(playerStrangerPrefix, FlagKeys.SEND_COMMAND), new FlagValue(false)),
+            new Pair(FlagPath.of(playerStrangerPrefix, FlagKeys.ENTER), new FlagValue(false)),
+            new Pair(FlagPath.of(playerStrangerPrefix, FlagKeys.EXIT), new FlagValue(false))
     );
     private static Region createTestRegion(int number, Flags testFlags) {
         World world = getWorld().get();
@@ -73,11 +91,11 @@ public class TestWorld {
 
         FlagPath textEnterPath = FlagPath.of(FlagKeys.MESSAGES, FlagKeys.ENTER);
         int number = 0;
-        for(FlagPath flagPath : testFlags) {
+        for(Pair<FlagPath, FlagValue> flagPathPair : testFlags) {
             Flags flags = new Flags();
             flags.setFlag(FlagPath.of(Flags.DEFAULT_KEY), new FlagValue(true));
-            flags.setFlag(flagPath, new FlagValue(false));
-            flags.setFlag(textEnterPath, new FlagValue("Testing: '"+flagPath.getFullPath()+"'"));
+            flags.setFlag(flagPathPair.getKey(), new FlagValue(false));
+            flags.setFlag(textEnterPath, new FlagValue("Testing: '"+flagPathPair.getKey().getFullPath()+"' = '"+flagPathPair.getValue().getValueToString()+"'"));
 
             createTestRegion(number++, flags);
         }
