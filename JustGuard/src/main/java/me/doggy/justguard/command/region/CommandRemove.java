@@ -17,6 +17,7 @@ import java.util.Optional;
 
 public class CommandRemove implements CommandExecutor
 {
+    //not recommended to execute while any offline player in this world, otherwise when player connect the new world will be created
     public CommandResult execute(CommandSource src, CommandContext args)
     {
         Optional<String> regionIdOpt = args.getOne(CommandsRegistrator.REGION_ID);

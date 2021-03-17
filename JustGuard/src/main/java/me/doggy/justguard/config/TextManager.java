@@ -5,15 +5,18 @@ import me.doggy.justguard.utils.FileUtils;
 import ninja.leaping.configurate.ConfigurationNode;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import java.io.File;
 import java.util.Arrays;
 
 public class TextManager {
 
+    private static final ConfigManager configManager = JustGuard.getInstance().getConfigManager();
     private static ConfigurationNode texts = null;
 
     public static void load()
     {
-        texts = FileUtils.getFileNode("texts.conf", JustGuard.getInstance().getConfigManager().getConfigDir());
+        final String textsFileName = "texts.conf";
+        texts = FileUtils.getFileNodeUsingResources(new File(configManager.getConfigDir(), textsFileName), textsFileName);
     }
 
     public static String getText(String key)
