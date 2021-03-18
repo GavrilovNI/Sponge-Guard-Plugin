@@ -26,8 +26,8 @@ public class CommandSetFlag implements CommandExecutor
     public CommandResult execute(CommandSource src, CommandContext args)
     {
         Optional<String> regionIdOpt = args.getOne(CommandsRegistrator.REGION_ID);
-        Optional<String> flagOpt = args.getOne("flag");
-        Optional<String> valueOpt = args.getOne("value");
+        Optional<String> flagOpt = args.getOne(CommandsRegistrator.FLAG_PATH);
+        Optional<String> valueOpt = args.getOne(CommandsRegistrator.FLAG_VALUE);
 
 
         if(!regionIdOpt.isPresent() || !flagOpt.isPresent() || !valueOpt.isPresent())

@@ -11,6 +11,7 @@ import me.doggy.justguard.command.region.pending.*;
 import me.doggy.justguard.consts.Permissions;
 import me.doggy.justguard.region.Region;
 import me.doggy.justguard.test.CommandRemoveTestWorld;
+import me.doggy.justguard.test.CommandTestFlag;
 import me.doggy.justguard.test.CommandTestWorld;
 import me.doggy.justguard.utils.help.MyAABB;
 import org.spongepowered.api.Sponge;
@@ -22,6 +23,8 @@ import org.spongepowered.api.util.Direction;
 public class CommandsRegistrator {
 
     public static final String REGION_ID = "region-id";
+    public static final String FLAG_PATH = "flag-path";
+    public static final String FLAG_VALUE = "flag-value";
     public static final String PAGE = "page";
 
     public static void register()
@@ -97,15 +100,15 @@ public class CommandsRegistrator {
                 .description(Text.of("No command description"))
                 .permission(Permissions.COMMAND_REGION_SETFLAG)
                 .arguments(GenericArguments.string(Text.of(REGION_ID)),
-                        GenericArguments.string(Text.of("flag")),
-                        GenericArguments.string(Text.of("value")))
+                        GenericArguments.string(Text.of(FLAG_PATH)),
+                        GenericArguments.string(Text.of(FLAG_VALUE)))
                 .executor(new CommandSetFlag())
                 .build();
         CommandSpec cmdRegionUnsetFlag = CommandSpec.builder()
                 .description(Text.of("No command description"))
                 .permission(Permissions.COMMAND_REGION_UNSETFLAG)
                 .arguments(GenericArguments.string(Text.of(REGION_ID)),
-                        GenericArguments.string(Text.of("flag")))
+                        GenericArguments.string(Text.of(FLAG_PATH)))
                 .executor(new CommandUnsetFlag())
                 .build();
 
@@ -164,16 +167,27 @@ public class CommandsRegistrator {
                 .build();
 
 
+
+
         CommandSpec cmdTestRemove = CommandSpec.builder()
                 .description(Text.of("No command description"))
                 .permission(Permissions.COMMAND_TEST_REMOVE)
                 .executor(new CommandRemoveTestWorld())
                 .build();
 
+        CommandSpec cmdTestFlag = CommandSpec.builder()
+                .description(Text.of("No command description"))
+                .permission(Permissions.COMMAND_TEST_FLAG)
+                .arguments(GenericArguments.optional(GenericArguments.string(Text.of("flags-id"))),
+                        GenericArguments.string(Text.of(FLAG_PATH)))
+                .executor(new CommandTestFlag())
+                .build();
+
         CommandSpec cmdTest = CommandSpec.builder()
                 .description(Text.of("No command description"))
                 .permission(Permissions.COMMAND_TEST_BASE)
                 .child(cmdTestRemove, "remove")
+                .child(cmdTestFlag, "flag")
                 .executor(new CommandTestWorld())
                 .build();
 

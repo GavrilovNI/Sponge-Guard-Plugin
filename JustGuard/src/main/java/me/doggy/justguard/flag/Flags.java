@@ -54,6 +54,7 @@ public class Flags {
 
 
         String key = path.getFirst();
+        FlagPath innerPath = path.cut(1);
         ConfigurationNode innerNode = currNode.getNode(key);
 
         if(!innerNode.isVirtual()) {
@@ -61,7 +62,6 @@ public class Flags {
                 return getFlag(innerNode, FlagPath.of(DEFAULT_KEY), new HashSet<ConfigurationNode>());
             }
 
-            FlagPath innerPath = path.cut(1);
             FlagValue value = getFlag(innerNode, innerPath, new HashSet<ConfigurationNode>()); // going inside
             if(!value.isEmpty())
                 return value;
@@ -78,9 +78,10 @@ public class Flags {
         }
 
         //looking for default
-        ConfigurationNode defaultNode = ConfigUtils.getAllInside(currNode.getNode(DEFAULT_KEY), DEFAULT_KEY);
-        if(!defaultNode.isVirtual())
-            return new FlagValue(defaultNode.getValue());
+        ConfigurationNode defaultNode = currNode.getNode(DEFAULT_KEY);
+        FlagValue defaultValue = getFlag(defaultNode, innerPath, new HashSet<ConfigurationNode>());
+        if(!defaultValue.isEmpty())
+            return defaultValue;
 
         //looking in flags this inherits from
         HashSet<ConfigurationNode> inheritsFromNodes = ConfigUtils.getAllNodesThisInheritsFrom(currNode, checkedFlags);

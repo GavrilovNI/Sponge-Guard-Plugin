@@ -18,6 +18,7 @@ public class Permissions {
     private static final String COMMAND_TEST_PREFIX = COMMAND_PREFIX + "test.";
     public static final String COMMAND_TEST_BASE = COMMAND_TEST_PREFIX + "base";
     public static final String COMMAND_TEST_REMOVE = COMMAND_TEST_PREFIX + "remove";
+    public static final String COMMAND_TEST_FLAG = COMMAND_TEST_PREFIX + "flag";
 
     private static final String COMMAND_REGION_PREFIX = COMMAND_PREFIX + "region.";
     public static final String COMMAND_REGION_BASE = COMMAND_REGION_PREFIX + "base";

@@ -53,13 +53,13 @@ public class PlayerFlagsEventListener {
 
     private static final Logger logger = JustGuard.getInstance().getLogger();
 
-    private boolean isTileEntity(BlockSnapshot blockSnapshot) {
+    /*private boolean isTileEntity(BlockSnapshot blockSnapshot) {
         Optional<Location<World>> locationOpt = blockSnapshot.getLocation();
         if(!locationOpt.isPresent()) {
             return blockSnapshot.createArchetype().isPresent();
         }
         return locationOpt.get().getTileEntity().isPresent();
-    }
+    }*/
     private FlagPath getId(BlockState blockState) {
         String lastId = blockState.getType().getId();
         FlagPath result = FlagPath.of(lastId);
@@ -67,8 +67,6 @@ public class PlayerFlagsEventListener {
     }
     private FlagPath getId(BlockSnapshot blockSnapshot) {
         FlagPath.Builder builder = FlagPath.builder().add(getId(blockSnapshot.getState()));
-        if(isTileEntity(blockSnapshot))
-            builder.addFront(FlagKeys.TILE_ENTITIES);
         return builder.build();
     }
     private FlagPath getId(Entity entity) {
@@ -131,25 +129,27 @@ public class PlayerFlagsEventListener {
     @Listener
     public void onPlayerInteractBlock_Primary(InteractBlockEvent.Primary event, @First Player player) {
         BlockSnapshot blockSnapshot = event.getTargetBlock();
-        FlagPath flagPath = FlagPath.of(FlagKeys.BLOCK_INTERACT, FlagKeys.PRIMARY, getId(blockSnapshot));
+        FlagPath flagPath = FlagPath.of(FlagKeys.BLOCK, FlagKeys.INTERACT, FlagKeys.PRIMARY, getId(blockSnapshot));
         handleEvent(event, player, blockSnapshot.getLocation(), flagPath);
     }
     @Listener
     public void onPlayerInteractBlock_Secondary(InteractBlockEvent.Secondary event, @First Player player) {
         BlockSnapshot blockSnapshot = event.getTargetBlock();
-        FlagPath flagPath = FlagPath.of(FlagKeys.BLOCK_INTERACT, FlagKeys.SECONDARY, getId(blockSnapshot));
-        handleEvent(event, player, blockSnapshot.getLocation(), flagPath);    }
+        FlagPath flagPath = FlagPath.of(FlagKeys.BLOCK, FlagKeys.INTERACT, FlagKeys.SECONDARY, getId(blockSnapshot));
+        handleEvent(event, player, blockSnapshot.getLocation(), flagPath);
+    }
     @Listener
     public void onPlayerCollideBlock(CollideBlockEvent event, @First Player player) {
         BlockState blockState = event.getTargetBlock();
-        FlagPath flagPath = FlagPath.of(FlagKeys.BLOCK_COLLIDE, getId(blockState));
+        FlagPath flagPath = FlagPath.of(FlagKeys.BLOCK, FlagKeys.COLLIDE, getId(blockState));
         handleEvent(event, player, event.getTargetLocation(), flagPath);
     }
     @Listener
     public void onPlayerBreakBlock(ChangeBlockEvent.Break event, @First Player player) {
         for(Transaction<BlockSnapshot> transaction : event.getTransactions()) {
             BlockSnapshot blockSnapshot = transaction.getOriginal();
-            FlagPath flagPath = FlagPath.of(FlagKeys.BLOCK_BREAK, getId(blockSnapshot));
+
+            FlagPath flagPath = FlagPath.of(FlagKeys.BLOCK, FlagKeys.BREAK, getId(blockSnapshot));
             if(handleEvent(event, player, blockSnapshot.getLocation(), flagPath))
                 return;
         }
@@ -158,7 +158,7 @@ public class PlayerFlagsEventListener {
     public void onPlayerPlaceBlock(ChangeBlockEvent.Place event, @First Player player) {
         for(Transaction<BlockSnapshot> transaction : event.getTransactions()) {
             BlockSnapshot blockSnapshot = transaction.getFinal();
-            FlagPath flagPath = FlagPath.of(FlagKeys.BLOCK_PLACE, getId(blockSnapshot));
+            FlagPath flagPath = FlagPath.of(FlagKeys.BLOCK, FlagKeys.PLACE, getId(blockSnapshot));
             if(handleEvent(event, player, blockSnapshot.getLocation(), flagPath))
                 return;
         }
@@ -171,7 +171,7 @@ public class PlayerFlagsEventListener {
             return;
 
         BlockSnapshot blockSnapshot = blockHitOpt.get();
-        FlagPath flagPath = FlagPath.of(FlagKeys.INVENTORY_INTERACT, FlagKeys.OPEN, getId(blockSnapshot));
+        FlagPath flagPath = FlagPath.of(FlagKeys.BLOCK, FlagKeys.OPEN_INVENTORY, getId(blockSnapshot));
         handleEvent(event, player, blockSnapshot.getLocation(), flagPath);
     }
 
@@ -182,13 +182,13 @@ public class PlayerFlagsEventListener {
     @Listener
     public void onPlayerInteractEntity_Primary(InteractEntityEvent.Primary event, @First Player player) {
         Entity entity = event.getTargetEntity();
-        FlagPath flagPath = FlagPath.of(FlagKeys.ENTITY_INTERACT, FlagKeys.PRIMARY, getId(entity));
+        FlagPath flagPath = FlagPath.of(FlagKeys.ENTITY, FlagKeys.INTERACT, FlagKeys.PRIMARY, getId(entity));
         handleEvent(event, player, entity.getLocation(), flagPath);
     }
     @Listener
     public void onPlayerInteractEntity_Secondary(InteractEntityEvent.Secondary event, @First Player player) {
         Entity entity = event.getTargetEntity();
-        FlagPath flagPath = FlagPath.of(FlagKeys.ENTITY_INTERACT, FlagKeys.SECONDARY, getId(entity));
+        FlagPath flagPath = FlagPath.of(FlagKeys.ENTITY, FlagKeys.INTERACT, FlagKeys.SECONDARY, getId(entity));
         handleEvent(event, player, entity.getLocation(), flagPath);
     }
     @Listener
@@ -200,7 +200,7 @@ public class PlayerFlagsEventListener {
             return;
 
         for (Entity entity : event.getEntities()) {
-            FlagPath flagPath = FlagPath.of(FlagKeys.ENTITY_SPAWN, getId(spawnTypeOpt.get()), getId(entity));
+            FlagPath flagPath = FlagPath.of(FlagKeys.ENTITY, FlagKeys.SPAWN, getId(spawnTypeOpt.get()), getId(entity));
             if(handleEvent(event, player, entity.getLocation(), flagPath)) {
                 if(!player.gameMode().get().equals(GameModes.CREATIVE)) {
                     Optional<ItemStackSnapshot> usedItemOpt = event.getContext().get(EventContextKeys.USED_ITEM);
@@ -226,19 +226,14 @@ public class PlayerFlagsEventListener {
 
         Player playerSource = (Player) entityDamageSource.getSource();
 
-        if(targetEntity instanceof Living) {
-            FlagPath flagPath = FlagPath.of(FlagKeys.ATTACK, getId(targetEntity));
-            handleEvent(event, playerSource, playerSource.getLocation(), flagPath);
-        } else {
-            FlagPath flagPath = FlagPath.of(FlagKeys.ENTITY_ATTACK, getId(targetEntity));
-            handleEvent(event, playerSource, targetEntity.getLocation(), flagPath);
-        }
+        FlagPath flagPath = FlagPath.of(FlagKeys.ENTITY, FlagKeys.ATTACK, getId(targetEntity));
+        handleEvent(event, playerSource, playerSource.getLocation(), flagPath);
     }
     private boolean onPlayerCollideEntity(CollideEntityEvent event, Player player, Set<Entity> entities) {
         for (Entity entity : entities) {
             if(entity.equals(player))
                 continue;
-            FlagPath flagPath = FlagPath.of(FlagKeys.ENTITY_COLLIDE, getId(entity));
+            FlagPath flagPath = FlagPath.of(FlagKeys.ENTITY, FlagKeys.COLLIDE, getId(entity));
             if(handleEvent(event, player, entity.getLocation(), flagPath))
                 return true;
         }
@@ -273,19 +268,19 @@ public class PlayerFlagsEventListener {
     @Listener
     public void onPlayerInteractItem_Primary(InteractItemEvent.Primary event, @First Player player) {
         ItemStackSnapshot itemStackSnapshot = event.getItemStack();
-        FlagPath flagPath = FlagPath.of(FlagKeys.ITEM_INTERACT, FlagKeys.PRIMARY, getId(itemStackSnapshot));
+        FlagPath flagPath = FlagPath.of(FlagKeys.ITEM, FlagKeys.INTERACT, FlagKeys.PRIMARY, getId(itemStackSnapshot));
         handleEvent(event, player, player.getLocation(), flagPath);
     }
     @Listener
     public void onPlayerInteractItem_Secondary(InteractItemEvent.Secondary event, @First Player player) {
         ItemStackSnapshot itemStackSnapshot = event.getItemStack();
-        FlagPath flagPath = FlagPath.of(FlagKeys.ITEM_INTERACT, FlagKeys.SECONDARY, getId(itemStackSnapshot));
+        FlagPath flagPath = FlagPath.of(FlagKeys.ITEM, FlagKeys.INTERACT, FlagKeys.SECONDARY, getId(itemStackSnapshot));
         handleEvent(event, player, player.getLocation(), flagPath);
     }
     @Listener
     public void onPlayerDropItem(DropItemEvent.Pre event, @First Player player) {
         for (ItemStackSnapshot itemStackSnapshot : event.getDroppedItems()) {
-            FlagPath flagPath = FlagPath.of(FlagKeys.ITEM_DROP, getId(itemStackSnapshot));
+            FlagPath flagPath = FlagPath.of(FlagKeys.ITEM, FlagKeys.DROP, getId(itemStackSnapshot));
             if(handleEvent(event, player, player.getLocation(), flagPath))
                 return;
         }
@@ -293,7 +288,7 @@ public class PlayerFlagsEventListener {
     @Listener
     public void onPlayerPickupItem(ChangeInventoryEvent.Pickup.Pre event, @First Player player) {
         for (ItemStackSnapshot itemStackSnapshot : event.getFinal()) {
-            FlagPath flagPath = FlagPath.of(FlagKeys.ITEM_PICKUP, getId(itemStackSnapshot));
+            FlagPath flagPath = FlagPath.of(FlagKeys.ITEM, FlagKeys.PICKUP, getId(itemStackSnapshot));
             if(handleEvent(event, player, player.getLocation(), flagPath))
                 return;
         }
@@ -301,7 +296,7 @@ public class PlayerFlagsEventListener {
     @Listener
     public void onPlayerUseItem(UseItemStackEvent.Start event, @First Player player) {
         ItemStackSnapshot itemStackSnapshot = event.getItemStackInUse();
-        FlagPath flagPath = FlagPath.of(FlagKeys.ITEM_USE, getId(itemStackSnapshot));
+        FlagPath flagPath = FlagPath.of(FlagKeys.ITEM, FlagKeys.USE, getId(itemStackSnapshot));
         handleEvent(event, player, player.getLocation(), flagPath);
     }
 
@@ -385,7 +380,7 @@ public class PlayerFlagsEventListener {
                 builder.add(FlagKeys.BASE);
             flagPath = builder.build();
         } else {
-            flagPath = FlagPath.of(FlagKeys.BASE);
+            flagPath = FlagPath.of(FlagKeys.WALK);
         }
         onEntityMove(event, flagPath);
     }

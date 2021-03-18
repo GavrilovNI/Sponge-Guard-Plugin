@@ -6,6 +6,7 @@ import me.doggy.justguard.flag.Groups;
 import me.doggy.justguard.region.Region;
 import me.doggy.justguard.utils.FileUtils;
 import ninja.leaping.configurate.ConfigurationNode;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 
 import java.io.File;
@@ -48,9 +49,11 @@ public class ConfigManager {
 
     private HashMap<String, Flags> flags;
 
+    @Nullable
     public Flags getRegionFlags(String name) {
         return flags.get(name);
     }
+    @Nullable
     public Flags getDefaultRegionFlags() { return getRegionFlags(DEFAULT_REGION_FLAGS_NAME); }
     public List<Flags> getTestFlags() { return testFlags; }
 

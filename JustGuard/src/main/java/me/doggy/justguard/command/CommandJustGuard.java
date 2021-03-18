@@ -33,16 +33,6 @@ public class CommandJustGuard implements CommandExecutor
     private static final ConfigManager configManager = JustGuard.getInstance().getConfigManager();
 
     public CommandResult execute(CommandSource src, CommandContext args) {
-
-        Optional<String> flagOpt = args.getOne("flag");
-
-        if(!flagOpt.isPresent())
-            return CommandResult.builder().successCount(0).build();
-
-        Flags flags = new Flags(configManager.getDefaultRegionFlags());
-        FlagValue flag = flags.getFlag(FlagPath.parse(flagOpt.get()));
-        logger.info(flag.toString());
-
         return CommandResult.success();
     }
 }
