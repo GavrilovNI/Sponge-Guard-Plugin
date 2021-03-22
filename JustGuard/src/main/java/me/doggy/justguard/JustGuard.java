@@ -3,8 +3,8 @@ package me.doggy.justguard;
 import com.google.inject.Inject;
 import me.doggy.justguard.command.CommandsRegistrator;
 import me.doggy.justguard.config.ConfigManager;
-import me.doggy.justguard.events.listeners.EventRegionSelect;
-import me.doggy.justguard.events.listeners.flags.PlayerFlagsEventListener;
+import me.doggy.justguard.events.listeners.RegionSelectEventListener;
+import me.doggy.justguard.events.listeners.flags.*;
 import net.luckperms.api.LuckPerms;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
@@ -111,10 +111,14 @@ public class JustGuard {
     {
         EventManager eventManager = Sponge.getEventManager();
 
-        eventManager.registerListeners(this, new EventRegionSelect());
+        eventManager.registerListeners(this, new RegionSelectEventListener());
 
         //player listeners
-        eventManager.registerListeners(this, new PlayerFlagsEventListener());
+        eventManager.registerListeners(this, new BlockInteractEventListener());
+        eventManager.registerListeners(this, new EntityInteractEventListener());
+        eventManager.registerListeners(this, new ItemInteractEventListener());
+        eventManager.registerListeners(this, new MoveEventListener());
+        eventManager.registerListeners(this, new PlayerSpecificEventListener());
     }
 
 

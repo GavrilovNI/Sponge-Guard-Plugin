@@ -19,7 +19,7 @@ import org.spongepowered.api.text.Text;
 
 import java.util.Optional;
 
-public class EventRegionSelect {
+public class RegionSelectEventListener {
 
     @Listener
     public void onLeftClick(InteractBlockEvent.Primary event, @First Player player){
